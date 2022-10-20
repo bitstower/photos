@@ -1,16 +1,12 @@
 # photos
 
-A new Flutter project.
+Photos. Together. Strong.
 
-## Getting Started
+## Development
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+$ flutter run \
+  --dart-define=S3_BUCKET_NAME=<bucket_name> \
+  --dart-define=S3_ACCESS_KEY=<access_key> \
+  --dart-define=S3_SECRET_KEY=<secret_key>
+```
