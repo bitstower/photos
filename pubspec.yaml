@@ -1,5 +1,5 @@
 name: photos
-description: A new Flutter project.
+description: Photos. Together. Strong.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -34,6 +34,7 @@ dependencies:
   cached_network_image:
   crypto:
   go_router:
+  photo_view:
 
 
   # The following adds the Cupertino Icons font to your application.

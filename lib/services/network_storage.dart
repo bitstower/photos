@@ -32,3 +32,15 @@ class StorjStorage extends NetworkStorage {
   StorjStorage(var bucketName, var accessKey, var secretKey)
       : super('gateway.storjshare.io', bucketName, accessKey, secretKey);
 }
+
+NetworkStorage buildNetworkStorage() {
+  const bucketName = String.fromEnvironment("S3_BUCKET_NAME");
+  const accessKey = String.fromEnvironment("S3_ACCESS_KEY");
+  const secretKey = String.fromEnvironment("S3_SECRET_KEY");
+
+  assert(bucketName.isNotEmpty);
+  assert(accessKey.isNotEmpty);
+  assert(secretKey.isNotEmpty);
+
+  return StorjStorage(bucketName, accessKey, secretKey);
+}

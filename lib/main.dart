@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:photos/views/detail.dart';
 import 'views/photos.dart';
 
 void main() {
@@ -27,6 +27,14 @@ class MyApp extends StatelessWidget {
         path: '/',
         builder: (BuildContext context, GoRouterState state) {
           return const MyHomePage(title: 'Bitstower Photos');
+        },
+      ),
+      GoRoute(
+        path: '/detail/:photoIndex',
+        builder: (BuildContext context, GoRouterState state) {
+          return DetailPage(
+              title: 'Photo',
+              photoIndex: int.parse(state.params['photoIndex']!));
         },
       ),
     ],

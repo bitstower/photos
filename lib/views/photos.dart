@@ -1,20 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
-
-NetworkStorage buildNetworkStorage() {
-  const bucketName = String.fromEnvironment("S3_BUCKET_NAME");
-  const accessKey = String.fromEnvironment("S3_ACCESS_KEY");
-  const secretKey = String.fromEnvironment("S3_SECRET_KEY");
-
-  assert(bucketName.isNotEmpty);
-  assert(accessKey.isNotEmpty);
-  assert(secretKey.isNotEmpty);
-
-  return StorjStorage(bucketName, accessKey, secretKey);
-}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -49,10 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       itemCount: endIndex - startIndex,
       itemBuilder: (context, index) {
-        final filePath = '/dataset/thumbs/${index + 1 + startIndex}.gif';
+        final photoIndex = index + 1 + startIndex;
+        final filePath = '/dataset/thumbs/${photoIndex}.gif';
         final fileUrl = networkStorage.buildUrl(filePath);
-        return CachedNetworkImage(
-            imageUrl: fileUrl, cacheKey: filePath, fit: BoxFit.cover);
+        return GestureDetector(
+            onTap: () => GoRouter.of(context).go('/detail/$photoIndex'),
+            child: CachedNetworkImage(
+                imageUrl: fileUrl, cacheKey: filePath, fit: BoxFit.cover));
       },
     );
   }
@@ -99,7 +90,11 @@ class _MyHomePageState extends State<MyHomePage> {
         // title: Text(widget.title),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        leading: const Icon(Icons.search_rounded),
+        leading: IconButton(
+          icon: const Icon(Icons.search_rounded),
+          tooltip: 'Search',
+          onPressed: () {},
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.backup),
