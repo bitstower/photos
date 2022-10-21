@@ -31,8 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
+        crossAxisSpacing: 3,
+        mainAxisSpacing: 3,
         maxCrossAxisExtent: 100.0,
       ),
       itemCount: endIndex - startIndex,
