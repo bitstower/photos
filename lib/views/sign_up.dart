@@ -16,7 +16,6 @@ class SignUpPage extends StatelessWidget {
         systemOverlayStyle: Ui.getLightSystemOverlay(),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
-        // title: Text(title),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back',
@@ -32,14 +31,6 @@ class SignUpPage extends StatelessWidget {
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 32,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'Create an account so you can backup and share your photos securly',
-                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 40),
@@ -67,53 +58,47 @@ class SignUpPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            CheckboxListTile(
-              title: RichText(
-                text: TextSpan(
-                  children: [
-                    const TextSpan(
-                      style: Ui.bodyTextStyle,
-                      text: "By creating an account you agree to the ",
-                    ),
-                    TextSpan(
-                      style: Ui.linkStyle,
-                      text: "terms of use",
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () async {
-                          var url = "https://bitstower.com/";
-                          await launchUrlString(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                    ),
-                    const TextSpan(
-                      style: Ui.bodyTextStyle,
-                      text: " and our ",
-                    ),
-                    TextSpan(
-                      style: Ui.linkStyle,
-                      text: "privacy policy",
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () async {
-                          var url = "https://bitstower.com/";
-                          await launchUrlString(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                    ),
-                    const TextSpan(
-                      style: Ui.bodyTextStyle,
-                      text: ".",
-                    ),
-                  ],
-                ),
+            RichText(
+              text: TextSpan(
+                children: [
+                  const TextSpan(
+                    style: Ui.bodyTextStyle,
+                    text: "By creating an account you agree to the ",
+                  ),
+                  TextSpan(
+                    style: Ui.linkStyle,
+                    text: "terms of use",
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () async {
+                        var url = "https://bitstower.com/";
+                        await launchUrlString(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                  ),
+                  const TextSpan(
+                    style: Ui.bodyTextStyle,
+                    text: " and our ",
+                  ),
+                  TextSpan(
+                    style: Ui.linkStyle,
+                    text: "privacy policy",
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () async {
+                        var url = "https://bitstower.com/";
+                        await launchUrlString(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                  ),
+                  const TextSpan(
+                    style: Ui.bodyTextStyle,
+                    text: ".",
+                  ),
+                ],
               ),
-              value: false,
-              onChanged: (bool? value) {},
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 10),
             ElevatedButton(

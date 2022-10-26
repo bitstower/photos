@@ -16,9 +16,9 @@ class _SignInPageState extends State<SignInPage> {
     return Scaffold(
       appBar: AppBar(
         systemOverlayStyle: Ui.getLightSystemOverlay(),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
-        title: Text(widget.title),
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back',
@@ -29,7 +29,14 @@ class _SignInPageState extends State<SignInPage> {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const Text(
+              'Sign in',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+              ),
+            ),
+            const SizedBox(height: 40),
             const TextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
