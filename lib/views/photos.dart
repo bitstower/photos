@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: const Icon(Icons.backup),
             tooltip: 'Backup',
-            onPressed: () => GoRouter.of(context).go('/sign-in'),
+            onPressed: () => GoRouter.of(context).go('/sign-up'),
           ),
         ],
       ),

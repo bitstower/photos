@@ -34,4 +34,7 @@ class Ui {
       systemStatusBarContrastEnforced: true,
     );
   }
+
+  static const bodyTextStyle = TextStyle(color: Colors.black);
+  static const linkStyle = TextStyle(color: Colors.blue);
 }

@@ -5,6 +5,7 @@ import 'views/detail.dart';
 import 'views/photos.dart';
 import 'views/vendors.dart';
 import 'views/sign_in.dart';
+import 'views/sign_up.dart';
 
 void main() {
   runApp(MyApp());
@@ -56,6 +57,14 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, GoRouterState state) {
           return const SignInPage(
             title: 'Sign In',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/sign-up',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SignUpPage(
+            title: 'Sign Up',
           );
         },
       ),
