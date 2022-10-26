@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:photos/views/detail.dart';
+import 'views/detail.dart';
 import 'views/photos.dart';
+import 'views/vendors.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,7 +18,10 @@ class MyApp extends StatelessWidget {
       routerConfig: _router,
       title: 'Bitstower Photos',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: false,
+      ),
     );
   }
 
@@ -35,6 +39,14 @@ class MyApp extends StatelessWidget {
           return DetailPage(
               title: 'Photo',
               photoIndex: int.parse(state.params['photoIndex']!));
+        },
+      ),
+      GoRoute(
+        path: '/vendors',
+        builder: (BuildContext context, GoRouterState state) {
+          return const VendorsPage(
+            title: 'Vendors',
+          );
         },
       ),
     ],

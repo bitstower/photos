@@ -35,7 +35,7 @@ dependencies:
   crypto:
   go_router:
   photo_view:
-
+  url_launcher:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
