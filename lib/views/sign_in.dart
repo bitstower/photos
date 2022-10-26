@@ -22,7 +22,7 @@ class _SignInPageState extends State<SignInPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back',
-          onPressed: () => GoRouter.of(context).go('/'),
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: Padding(

@@ -114,9 +114,9 @@ class _VendorsPageState extends State<VendorsPage> {
           )
         ],
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.close_rounded),
           tooltip: 'Back',
-          onPressed: () => GoRouter.of(context).go('/'),
+          onPressed: () => GoRouter.of(context).pop(),
         ),
       ),
       body: Padding(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photos/views/sign_in.dart';
+import 'package:photos/views/sign_up.dart';
 import 'views/detail.dart';
 import 'views/photos.dart';
 import 'views/vendors.dart';
 import 'views/sign_in.dart';
-import 'views/sign_up.dart';
 
 void main() {
   runApp(MyApp());
@@ -63,9 +63,7 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/sign-up',
         builder: (BuildContext context, GoRouterState state) {
-          return const SignUpPage(
-            title: 'Sign Up',
-          );
+          return const SignUpPage();
         },
       ),
     ],
