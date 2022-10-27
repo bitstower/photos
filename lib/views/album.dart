@@ -25,6 +25,8 @@ class AlbumPage extends StatefulWidget {
 }
 
 class _AlbumPageState extends State<AlbumPage> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
   final networkStorage = buildNetworkStorage();
 
   Widget buildGrid(int startIndex, int endIndex) {
@@ -102,13 +104,24 @@ class _AlbumPageState extends State<AlbumPage> {
           ),
         ],
       ),
-      body: ListView(
-        // padding: const EdgeInsets.only(top: 32, bottom: 16),
-        children: <Widget>[
-          buildEntry('Today', 20, 25),
-          buildEntry('Wednesday', 15, 20),
-          buildEntry('Tue, Aug 11', 0, 15),
-        ],
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        color: Colors.white,
+        backgroundColor: Colors.blueGrey,
+        strokeWidth: 2.0,
+        onRefresh: () async {
+          // TODO
+          return Future<void>.delayed(const Duration(seconds: 3));
+        },
+        // Pull from top to show refresh indicator.
+        child: ListView(
+          // padding: const EdgeInsets.only(top: 32, bottom: 16),
+          children: <Widget>[
+            buildEntry('Today', 20, 25),
+            buildEntry('Wednesday', 15, 20),
+            buildEntry('Tue, Aug 11', 0, 15),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

@@ -50,7 +50,7 @@ class _PhotoPageState extends State<PhotoPage> {
       body: PhotoView(
         imageProvider: CachedNetworkImageProvider(fileUrl, cacheKey: filePath),
         minScale: PhotoViewComputedScale.contained,
-        maxScale: PhotoViewComputedScale.covered * 1.8,
+        maxScale: PhotoViewComputedScale.covered * 2,
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
