@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import '../services/network_storage.dart';
 
 class PhotoPage extends StatefulWidget {
-  const PhotoPage({super.key, required this.title, required this.photoIndex});
-  final String title;
+  const PhotoPage({super.key, required this.photoIndex});
+  final String title = 'Photo';
   final int photoIndex;
 
   @override

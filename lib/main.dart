@@ -31,36 +31,40 @@ class App extends StatelessWidget {
   final GoRouter _router = GoRouter(
     routes: <GoRoute>[
       GoRoute(
+        name: 'home',
         path: '/',
-        builder: (BuildContext context, GoRouterState state) {
-          return const AlbumPage(
-            title: 'Bitstower Photos',
-          );
+        redirect: (BuildContext context, GoRouterState state) {
+          return '/album/all';
         },
       ),
       GoRoute(
-        path: '/photo/:photoIndex',
+        path: '/album/all',
         builder: (BuildContext context, GoRouterState state) {
-          return PhotoPage(
-            title: 'Photo',
-            photoIndex: int.parse(state.params['photoIndex']!),
-          );
+          return const AlbumPage();
         },
+        routes: [
+          GoRoute(
+            path: 'photo/:photoIndex',
+            builder: (BuildContext context, GoRouterState state) {
+              return PhotoPage(
+                photoIndex: int.parse(
+                  state.params['photoIndex']!,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/vendors',
         builder: (BuildContext context, GoRouterState state) {
-          return const VendorsPage(
-            title: 'Vendors',
-          );
+          return const VendorsPage();
         },
       ),
       GoRoute(
         path: '/sign-in',
         builder: (BuildContext context, GoRouterState state) {
-          return const SignInPage(
-            title: 'Sign In',
-          );
+          return const SignInPage();
         },
       ),
       GoRoute(

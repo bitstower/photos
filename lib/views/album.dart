@@ -7,7 +7,7 @@ import '../utils/ui.dart';
 enum Menu { freeUpSpace }
 
 class AlbumPage extends StatefulWidget {
-  const AlbumPage({super.key, required this.title});
+  const AlbumPage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -18,7 +18,7 @@ class AlbumPage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
+  final String title = 'Bitstower Photos';
 
   @override
   State<AlbumPage> createState() => _AlbumPageState();
@@ -43,7 +43,8 @@ class _AlbumPageState extends State<AlbumPage> {
         final filePath = '/dataset/thumbs/${photoIndex}.gif';
         final fileUrl = networkStorage.buildUrl(filePath);
         return GestureDetector(
-            onTap: () => GoRouter.of(context).go('/photo/$photoIndex'),
+            onTap: () =>
+                GoRouter.of(context).go('/album/all/photo/$photoIndex'),
             child: CachedNetworkImage(
                 imageUrl: fileUrl, cacheKey: filePath, fit: BoxFit.cover));
       },

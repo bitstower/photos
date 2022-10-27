@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../utils/ui.dart';
 
 class SignInPage extends StatefulWidget {
-  const SignInPage({super.key, required this.title});
-  final String title;
+  const SignInPage({super.key});
+  final String title = 'Sign in';
 
   @override
   State<SignInPage> createState() => _SignInPageState();

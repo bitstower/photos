@@ -5,8 +5,8 @@ import '../utils/ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VendorsPage extends StatefulWidget {
-  const VendorsPage({super.key, required this.title});
-  final String title;
+  const VendorsPage({super.key});
+  final String title = 'Vendors';
 
   @override
   State<VendorsPage> createState() => _VendorsPageState();
