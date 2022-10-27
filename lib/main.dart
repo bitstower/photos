@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:photos/views/sign_in.dart';
-import 'package:photos/views/sign_up.dart';
-import 'views/detail.dart';
-import 'views/photos.dart';
+import 'views/photo.dart';
+import 'views/album.dart';
 import 'views/vendors.dart';
 import 'views/sign_in.dart';
+import 'views/sign_up.dart';
 import 'views/connect_vendor.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(App());
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class App extends StatelessWidget {
+  App({super.key});
 
   // This widget is the root of your application.
   @override
@@ -34,15 +33,18 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/',
         builder: (BuildContext context, GoRouterState state) {
-          return const MyHomePage(title: 'Bitstower Photos');
+          return const AlbumPage(
+            title: 'Bitstower Photos',
+          );
         },
       ),
       GoRoute(
-        path: '/detail/:photoIndex',
+        path: '/photo/:photoIndex',
         builder: (BuildContext context, GoRouterState state) {
-          return DetailPage(
-              title: 'Photo',
-              photoIndex: int.parse(state.params['photoIndex']!));
+          return PhotoPage(
+            title: 'Photo',
+            photoIndex: int.parse(state.params['photoIndex']!),
+          );
         },
       ),
       GoRoute(

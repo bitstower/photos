@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../services/network_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import '../services/network_storage.dart';
 
-class DetailPage extends StatefulWidget {
-  const DetailPage({super.key, required this.title, required this.photoIndex});
+class PhotoPage extends StatefulWidget {
+  const PhotoPage({super.key, required this.title, required this.photoIndex});
   final String title;
   final int photoIndex;
 
   @override
-  State<DetailPage> createState() => _DetailPageState();
+  State<PhotoPage> createState() => _PhotoPageState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _PhotoPageState extends State<PhotoPage> {
   final networkStorage = buildNetworkStorage();
 
   @override

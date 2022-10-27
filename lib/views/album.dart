@@ -6,8 +6,8 @@ import '../utils/ui.dart';
 
 enum Menu { freeUpSpace }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class AlbumPage extends StatefulWidget {
+  const AlbumPage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -21,10 +21,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AlbumPage> createState() => _AlbumPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _AlbumPageState extends State<AlbumPage> {
   final networkStorage = buildNetworkStorage();
 
   Widget buildGrid(int startIndex, int endIndex) {
@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         final filePath = '/dataset/thumbs/${photoIndex}.gif';
         final fileUrl = networkStorage.buildUrl(filePath);
         return GestureDetector(
-            onTap: () => GoRouter.of(context).go('/detail/$photoIndex'),
+            onTap: () => GoRouter.of(context).go('/photo/$photoIndex'),
             child: CachedNetworkImage(
                 imageUrl: fileUrl, cacheKey: filePath, fit: BoxFit.cover));
       },
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         systemOverlayStyle: Ui.getLightSystemOverlay(),
-        // Here we take the value from the MyHomePage object that was created by
+        // Here we take the value from the AlbumPage object that was created by
         // the App.build method, and use it to set our appbar title.
         // title: Text(widget.title),
         backgroundColor: Colors.white,
