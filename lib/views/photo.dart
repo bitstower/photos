@@ -48,24 +48,26 @@ class _PhotoPageState extends State<PhotoPage> {
         ),
       ),
       body: PhotoView(
-          imageProvider:
-              CachedNetworkImageProvider(fileUrl, cacheKey: filePath),
-          minScale: PhotoViewComputedScale.contained),
+        imageProvider: CachedNetworkImageProvider(fileUrl, cacheKey: filePath),
+        minScale: PhotoViewComputedScale.contained,
+        maxScale: PhotoViewComputedScale.covered * 1.8,
+      ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.share_outlined),
-              label: 'Share',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.delete_outline),
-              label: 'Delete',
-            ),
-          ],
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white,
-          backgroundColor: Colors.transparent,
-          type: BottomNavigationBarType.fixed),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.share_outlined),
+            label: 'Share',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.delete_outline),
+            label: 'Delete',
+          ),
+        ],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        type: BottomNavigationBarType.fixed,
+      ),
     );
   }
 }
