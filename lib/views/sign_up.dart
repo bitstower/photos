@@ -132,7 +132,9 @@ class SignUpPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50),
               ),
-              onPressed: () {},
+              onPressed: () {
+                GoRouter.of(context).push('/connect-vendor');
+              },
               child: const Text(
                 'Create account',
               ),
