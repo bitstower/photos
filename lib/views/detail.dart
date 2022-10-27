@@ -58,14 +58,6 @@ class _DetailPageState extends State<DetailPage> {
               label: 'Share',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.rotate_left_rounded),
-              label: 'Rotate left',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.rotate_right_rounded),
-              label: 'Rotate right',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.delete_outline),
               label: 'Delete',
             ),

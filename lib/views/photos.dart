@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
 
+enum Menu { freeUpSpace }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -80,16 +82,22 @@ class _MyHomePageState extends State<MyHomePage> {
         // title: Text(widget.title),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.search_rounded),
-          tooltip: 'Search',
-          onPressed: () {},
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.backup),
             tooltip: 'Backup',
             onPressed: () => GoRouter.of(context).push('/sign-up'),
+          ),
+          PopupMenuButton<Menu>(
+            onSelected: (Menu item) {
+              GoRouter.of(context).push('/sign-up');
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+              const PopupMenuItem<Menu>(
+                value: Menu.freeUpSpace,
+                child: Text('Free up space'),
+              ),
+            ],
           ),
         ],
       ),
@@ -106,10 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.insert_photo_rounded),
             label: 'Photos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.photo_album_outlined),
-            label: 'Albums',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
