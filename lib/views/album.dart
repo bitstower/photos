@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
@@ -8,15 +9,6 @@ enum Menu { freeUpSpace }
 
 class AlbumPage extends StatefulWidget {
   const AlbumPage({super.key});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title = 'Bitstower Photos';
 
@@ -71,71 +63,68 @@ class _AlbumPageState extends State<AlbumPage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        systemOverlayStyle: Ui.getLightSystemOverlay(),
-        // Here we take the value from the AlbumPage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        // title: Text(widget.title),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.backup),
-            tooltip: 'Backup',
-            onPressed: () => GoRouter.of(context).push('/sign-up'),
-          ),
-          PopupMenuButton<Menu>(
-            onSelected: (Menu item) {
-              GoRouter.of(context).push('/sign-up');
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-              const PopupMenuItem<Menu>(
-                value: Menu.freeUpSpace,
-                child: Text('Free up space'),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        color: Colors.white,
-        backgroundColor: Colors.blueGrey,
-        strokeWidth: 2.0,
-        onRefresh: () async {
-          // TODO
-          return Future<void>.delayed(const Duration(seconds: 3));
-        },
-        // Pull from top to show refresh indicator.
-        child: ListView(
-          // padding: const EdgeInsets.only(top: 32, bottom: 16),
-          children: <Widget>[
-            buildEntry('Today', 20, 25),
-            buildEntry('Wednesday', 15, 20),
-            buildEntry('Tue, Aug 11', 0, 15),
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // value: style,
+      value: Ui.darkNavigationBar(),
+      child: Scaffold(
+        appBar: AppBar(
+          systemOverlayStyle: Ui.darkStatusBar(),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.backup),
+              tooltip: 'Backup',
+              onPressed: () => GoRouter.of(context).push('/sign-up'),
+            ),
+            PopupMenuButton<Menu>(
+              onSelected: (Menu item) {
+                GoRouter.of(context).push('/sign-up');
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+                const PopupMenuItem<Menu>(
+                  value: Menu.freeUpSpace,
+                  child: Text('Free up space'),
+                ),
+              ],
+            ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.insert_photo_rounded),
-            label: 'Photos',
+        body: RefreshIndicator(
+          key: _refreshIndicatorKey,
+          color: Colors.white,
+          backgroundColor: Colors.blueGrey,
+          strokeWidth: 2.0,
+          onRefresh: () async {
+            // TODO
+            return Future<void>.delayed(const Duration(seconds: 3));
+          },
+          // Pull from top to show refresh indicator.
+          child: ListView(
+            // padding: const EdgeInsets.only(top: 32, bottom: 16),
+            children: <Widget>[
+              buildEntry('Today', 20, 25),
+              buildEntry('Wednesday', 15, 20),
+              buildEntry('Tue, Aug 11', 0, 15),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: 0,
-        selectedItemColor: Colors.blueGrey,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.insert_photo_rounded),
+              label: 'Photos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: 0,
+          selectedItemColor: Colors.blueGrey,
+        ),
       ),
     );
   }

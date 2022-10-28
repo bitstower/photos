@@ -2,36 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class Ui {
-  static SystemUiOverlayStyle getLightSystemOverlay() {
+  // Important:
+  //
+  // Set navigation bar style using AnnotatedRegion.
+  // Set status bar style using Scaffold.appBar.systemOverlayStyle
+
+  static SystemUiOverlayStyle lightStatusBar() {
     return const SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-
-      // For Android (dark icons)
-      statusBarIconBrightness: Brightness.dark,
-
-      // For iOS (dark icons)
+      statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.light,
-
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      systemStatusBarContrastEnforced: false,
     );
   }
 
-  static SystemUiOverlayStyle getDarkSystemOverlay() {
+  static SystemUiOverlayStyle darkStatusBar() {
     return const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-
-      // For Android (light icons)
-      statusBarIconBrightness: Brightness.light,
-
-      // For iOS (light icons)
       statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      systemStatusBarContrastEnforced: false,
+    );
+  }
 
-      systemNavigationBarColor: Colors.black,
+  static SystemUiOverlayStyle lightNavigationBar() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    return const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: null,
       systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarContrastEnforced: false,
+    );
+  }
 
-      // Adds background shadow
-      systemStatusBarContrastEnforced: true,
+  static SystemUiOverlayStyle darkNavigationBar() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    return const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: null,
+      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarContrastEnforced: false,
     );
   }
 

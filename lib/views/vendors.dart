@@ -103,9 +103,9 @@ class _VendorsPageState extends State<VendorsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        systemOverlayStyle: Ui.getLightSystemOverlay(),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        // systemOverlayStyle: Ui.getLightSystemOverlay(),
+        // backgroundColor: Colors.white,
+        // foregroundColor: Colors.black,
         title: const Text('Estimate costs'),
         actions: [
           IconButton(
