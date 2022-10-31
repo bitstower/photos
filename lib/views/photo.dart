@@ -15,6 +15,36 @@ class PhotoPage extends StatefulWidget {
   State<PhotoPage> createState() => _PhotoPageState();
 }
 
+showDeleteDialog(BuildContext context) {
+  // set up the buttons
+  Widget cancelButton = TextButton(
+    child: Text("Cancel"),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  );
+  Widget confirmButton = TextButton(
+    child: Text("Delete"),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  ); // set up the AlertDialog
+  AlertDialog alert = AlertDialog(
+    title: Text("Confirm"),
+    content: Text("Are you sure to delete this file?"),
+    actions: [
+      cancelButton,
+      confirmButton,
+    ],
+  ); // show the dialog
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}
+
 class _PhotoPageState extends State<PhotoPage> {
   final networkStorage = buildNetworkStorage();
 
@@ -78,6 +108,9 @@ class _PhotoPageState extends State<PhotoPage> {
               label: 'Delete',
             ),
           ],
+          onTap: ((value) {
+            showDeleteDialog(context);
+          }),
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white,
           backgroundColor: Colors.transparent,
