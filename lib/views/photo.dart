@@ -16,27 +16,27 @@ class PhotoPage extends StatefulWidget {
 }
 
 showDeleteDialog(BuildContext context) {
-  // set up the buttons
   Widget cancelButton = TextButton(
     child: Text("Cancel"),
     onPressed: () {
       Navigator.of(context).pop();
     },
   );
-  Widget confirmButton = TextButton(
+  Widget deleteButton = TextButton(
     child: Text("Delete"),
     onPressed: () {
       Navigator.of(context).pop();
     },
-  ); // set up the AlertDialog
+  );
   AlertDialog alert = AlertDialog(
     title: Text("Confirm"),
     content: Text("Are you sure to delete this file?"),
     actions: [
       cancelButton,
-      confirmButton,
+      deleteButton,
     ],
-  ); // show the dialog
+  );
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -73,7 +73,7 @@ class _PhotoPageState extends State<PhotoPage> {
           systemOverlayStyle: Ui.lightStatusBar(),
           backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
-          elevation: 0, // remove shadow
+          elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             tooltip: 'Back',
@@ -81,8 +81,6 @@ class _PhotoPageState extends State<PhotoPage> {
           ),
         ),
         body: PageView.builder(
-          /// [PageView.scrollDirection] defaults to [Axis.horizontal].
-          /// Use [Axis.vertical] to scroll vertically.
           controller: controller,
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {
