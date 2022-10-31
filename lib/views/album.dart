@@ -21,52 +21,9 @@ class _AlbumPageState extends State<AlbumPage> {
       GlobalKey<RefreshIndicatorState>();
   final networkStorage = buildNetworkStorage();
 
-  Widget buildGrid(int startIndex, int endIndex) {
-    return GridView.builder(
-      // disable scroll
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        crossAxisSpacing: 3,
-        mainAxisSpacing: 3,
-        maxCrossAxisExtent: 100.0,
-      ),
-      itemCount: endIndex - startIndex,
-      itemBuilder: (context, index) {
-        final photoIndex = index + 1 + startIndex;
-        final filePath = '/dataset/thumbs/${photoIndex}.gif';
-        final fileUrl = networkStorage.buildUrl(filePath);
-        return GestureDetector(
-            onTap: () =>
-                GoRouter.of(context).go('/album/all/photo/$photoIndex'),
-            child: CachedNetworkImage(
-                imageUrl: fileUrl, cacheKey: filePath, fit: BoxFit.cover));
-      },
-    );
-  }
-
-  Widget buildEntry(String label, int startIndex, int endIndex) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ),
-        buildGrid(startIndex, endIndex),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      // value: style,
       value: Ui.darkNavigationBar(),
       child: Scaffold(
         appBar: AppBar(
@@ -102,13 +59,25 @@ class _AlbumPageState extends State<AlbumPage> {
             return Future<void>.delayed(const Duration(seconds: 3));
           },
           // Pull from top to show refresh indicator.
-          child: ListView(
-            // padding: const EdgeInsets.only(top: 32, bottom: 16),
-            children: <Widget>[
-              buildEntry('Today', 20, 25),
-              buildEntry('Wednesday', 15, 20),
-              buildEntry('Tue, Aug 11', 0, 15),
-            ],
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              crossAxisSpacing: 3,
+              mainAxisSpacing: 3,
+              maxCrossAxisExtent: 100.0,
+            ),
+            itemCount: 25,
+            itemBuilder: (context, index) {
+              final photoIndex = index + 1;
+              final filePath = '/dataset/thumbs/${photoIndex}.gif';
+              final fileUrl = networkStorage.buildUrl(filePath);
+              return GestureDetector(
+                  onTap: () =>
+                      GoRouter.of(context).go('/album/all/photo/$photoIndex'),
+                  child: CachedNetworkImage(
+                      imageUrl: fileUrl,
+                      cacheKey: filePath,
+                      fit: BoxFit.cover));
+            },
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
