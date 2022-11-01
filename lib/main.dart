@@ -6,6 +6,7 @@ import 'views/vendors.dart';
 import 'views/sign_in.dart';
 import 'views/sign_up.dart';
 import 'views/setup_vendor.dart';
+import 'views/setup_access.dart';
 
 void main() {
   runApp(App());
@@ -76,6 +77,12 @@ class App extends StatelessWidget {
         path: '/setup-vendor',
         builder: (BuildContext context, GoRouterState state) {
           return const SetupVendorPage();
+        },
+      ),
+      GoRoute(
+        path: '/setup-access',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SetupAccessPage();
         },
       ),
     ],
