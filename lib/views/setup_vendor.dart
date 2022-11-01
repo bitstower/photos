@@ -6,8 +6,8 @@ import 'package:photos/components/vendor_card.dart';
 import '../utils/ui.dart';
 import '../components/vendor_dialog.dart';
 
-class ConnectAccessPage extends StatelessWidget {
-  const ConnectAccessPage({super.key});
+class SetupVendorPage extends StatelessWidget {
+  const SetupVendorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class ConnectAccessPage extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   onPressed: () {
-                    GoRouter.of(context).push('/connect-vendor');
+                    GoRouter.of(context).push('/setup-access');
                   },
                   child: const Text(
                     'Next',
