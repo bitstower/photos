@@ -6,6 +6,7 @@ import 'views/vendors.dart';
 import 'views/sign_in.dart';
 import 'views/sign_up.dart';
 import 'views/connect_vendor.dart';
+import 'views/connect_access.dart';
 
 void main() {
   runApp(App());
@@ -76,6 +77,12 @@ class App extends StatelessWidget {
         path: '/connect-vendor',
         builder: (BuildContext context, GoRouterState state) {
           return const ConnectVendorPage();
+        },
+      ),
+      GoRoute(
+        path: '/connect-access',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ConnectAccessPage();
         },
       ),
     ],

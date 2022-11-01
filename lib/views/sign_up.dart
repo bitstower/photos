@@ -137,7 +137,7 @@ class SignUpPage extends StatelessWidget {
                   minimumSize: const Size.fromHeight(50),
                 ),
                 onPressed: () {
-                  GoRouter.of(context).push('/connect-vendor');
+                  GoRouter.of(context).push('/connect-access');
                 },
                 child: const Text(
                   'Create account',

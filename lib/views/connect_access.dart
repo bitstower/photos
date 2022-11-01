@@ -5,8 +5,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:photos/components/vendor_card.dart';
 import '../utils/ui.dart';
 
-class ConnectVendorPage extends StatelessWidget {
-  const ConnectVendorPage({super.key});
+class ConnectAccessPage extends StatelessWidget {
+  const ConnectAccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +20,18 @@ class ConnectVendorPage extends StatelessWidget {
           foregroundColor: Colors.black,
           leading: IconButton(
             icon: const Icon(Icons.close_rounded),
-            tooltip: 'Close',
+            tooltip: 'Back',
             onPressed: () => GoRouter.of(context).go('/'),
           ),
+          actions: [
+            TextButton(
+              onPressed: () {},
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text('Change provider'),
+              ),
+            )
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(10),
@@ -34,29 +43,33 @@ class ConnectVendorPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Set up your account',
+                    'Connect to your Storj account',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 32,
+                      fontSize: 24,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      'Select the storage provider you want to connect to:',
+                      'Don\'t have Storj account? Create one. Then create and import access grant.',
                       textAlign: TextAlign.center,
                     ),
                   ),
                   const SizedBox(height: 30),
                   CarouselSlider(
-                    options: CarouselOptions(height: 300.0),
-                    items: [1, 2, 3, 4, 5].map((i) {
+                    options: CarouselOptions(
+                      height: 450.0,
+                      initialPage: 0,
+                      enableInfiniteScroll: false,
+                    ),
+                    items: [1, 2, 3].map((i) {
                       return Builder(
                         builder: (BuildContext context) {
                           return Container(
-                            padding: const EdgeInsets.all(16.0),
+                            clipBehavior: Clip.hardEdge,
                             decoration: BoxDecoration(
                               border: Border.all(width: 1, color: Colors.blue),
                               borderRadius:
@@ -64,7 +77,10 @@ class ConnectVendorPage extends StatelessWidget {
                             ),
                             width: MediaQuery.of(context).size.width,
                             margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            child: VendorCard(name: 'Storj'),
+                            child: Image(
+                              image: AssetImage('assets/step${i}.png'),
+                              fit: BoxFit.fill,
+                            ),
                           );
                         },
                       );
@@ -80,7 +96,7 @@ class ConnectVendorPage extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   onPressed: () {
-                    GoRouter.of(context).push('/connect-access');
+                    GoRouter.of(context).push('/connect-vendor');
                   },
                   child: const Text(
                     'Next',
