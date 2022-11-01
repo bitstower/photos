@@ -35,13 +35,14 @@ class Ui {
     );
   }
 
-  static SystemUiOverlayStyle darkNavigationBar() {
+  static SystemUiOverlayStyle darkNavigationBar(
+      {bool contrastEnforced = false}) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    return const SystemUiOverlayStyle(
+    return SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: null,
       systemNavigationBarIconBrightness: Brightness.dark,
-      systemNavigationBarContrastEnforced: false,
+      systemNavigationBarContrastEnforced: contrastEnforced,
     );
   }
 
