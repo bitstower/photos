@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:photos/components/vendor_card.dart';
 import '../utils/ui.dart';
+import '../components/vendor_dialog.dart';
 
 class ConnectAccessPage extends StatelessWidget {
   const ConnectAccessPage({super.key});
@@ -24,13 +25,20 @@ class ConnectAccessPage extends StatelessWidget {
             onPressed: () => GoRouter.of(context).go('/'),
           ),
           actions: [
-            TextButton(
-              onPressed: () {},
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return VendorDialog();
+                    },
+                  );
+                },
                 child: Text('Change provider'),
               ),
-            )
+            ),
           ],
         ),
         body: Padding(
