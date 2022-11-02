@@ -67,7 +67,7 @@ class SetupAccessPage extends StatelessWidget {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   onPressed: () {
-                    GoRouter.of(context).push('/');
+                    GoRouter.of(context).pushNamed('home');
                   },
                   child: const Text(
                     'Done',

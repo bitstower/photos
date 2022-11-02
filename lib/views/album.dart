@@ -5,8 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
+import 'package:flutter/cupertino.dart';
 
-enum Menu { freeUpSpace }
+enum Menu { freeUpSpace, settings }
 
 class AlbumPage extends StatefulWidget {
   const AlbumPage({super.key});
@@ -33,10 +34,9 @@ class _AlbumPageState extends State<AlbumPage> {
             systemOverlayStyle: Ui.darkStatusBar(),
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
-            leading: IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {},
-            ),
+            title: Text('Photos'),
+            centerTitle: true,
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
                 icon: const Icon(Icons.backup),
@@ -51,6 +51,10 @@ class _AlbumPageState extends State<AlbumPage> {
                   const PopupMenuItem<Menu>(
                     value: Menu.freeUpSpace,
                     child: Text('Free up space'),
+                  ),
+                  const PopupMenuItem<Menu>(
+                    value: Menu.settings,
+                    child: Text('Settings'),
                   ),
                 ],
               ),

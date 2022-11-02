@@ -62,7 +62,7 @@ class SetupVendorPage extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      'Don\'t have Storj account? Create one. Then create and import access grant.',
+                      'Create and import access grant. Don\'t have Storj account? Sign up',
                       textAlign: TextAlign.center,
                     ),
                   ),
