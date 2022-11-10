@@ -5,9 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
-import 'package:flutter/cupertino.dart';
 
-enum Menu { freeUpSpace, settings }
+enum Menu { freeUpSpace, settings, image_debug }
 
 class AlbumPage extends StatefulWidget {
   const AlbumPage({super.key});
@@ -45,7 +44,11 @@ class _AlbumPageState extends State<AlbumPage> {
               ),
               PopupMenuButton<Menu>(
                 onSelected: (Menu item) {
-                  GoRouter.of(context).push('/sign-up');
+                  if (item == Menu.image_debug) {
+                    GoRouter.of(context).pushNamed('image_debug');
+                  } else {
+                    GoRouter.of(context).push('/sign-up');
+                  }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
                   const PopupMenuItem<Menu>(
@@ -55,6 +58,10 @@ class _AlbumPageState extends State<AlbumPage> {
                   const PopupMenuItem<Menu>(
                     value: Menu.settings,
                     child: Text('Settings'),
+                  ),
+                  const PopupMenuItem<Menu>(
+                    value: Menu.image_debug,
+                    child: Text('Image Debug'),
                   ),
                 ],
               ),

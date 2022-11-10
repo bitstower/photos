@@ -7,6 +7,7 @@ import 'views/sign_in.dart';
 import 'views/sign_up.dart';
 import 'views/setup_vendor.dart';
 import 'views/setup_access.dart';
+import 'views/image_debug.dart';
 
 void main() {
   runApp(App());
@@ -83,6 +84,13 @@ class App extends StatelessWidget {
         path: '/setup-access',
         builder: (BuildContext context, GoRouterState state) {
           return const SetupAccessPage();
+        },
+      ),
+      GoRoute(
+        name: 'image_debug',
+        path: '/image-debug',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ImageDebugPage();
         },
       ),
     ],
