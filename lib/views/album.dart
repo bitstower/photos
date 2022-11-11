@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
 
-enum Menu { freeUpSpace, settings, image_debug }
+enum Menu { freeUpSpace, settings, image_debug, video_debug }
 
 class AlbumPage extends StatefulWidget {
   const AlbumPage({super.key});
@@ -46,6 +46,8 @@ class _AlbumPageState extends State<AlbumPage> {
                 onSelected: (Menu item) {
                   if (item == Menu.image_debug) {
                     GoRouter.of(context).pushNamed('image_debug');
+                  } else if (item == Menu.video_debug) {
+                    GoRouter.of(context).pushNamed('video_debug');
                   } else {
                     GoRouter.of(context).push('/sign-up');
                   }
@@ -62,6 +64,10 @@ class _AlbumPageState extends State<AlbumPage> {
                   const PopupMenuItem<Menu>(
                     value: Menu.image_debug,
                     child: Text('Image Debug'),
+                  ),
+                  const PopupMenuItem<Menu>(
+                    value: Menu.video_debug,
+                    child: Text('Video Debug'),
                   ),
                 ],
               ),

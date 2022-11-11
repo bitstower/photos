@@ -39,7 +39,13 @@ dependencies:
   carousel_slider:
   draggable_scrollbar:
   flutter_image_compress:
+  video_compress:
+  video_thumbnail:
   image_picker:
+  file_picker:
+  path_provider:
+  uuid:
+  logging:
   exif:
 
   # The following adds the Cupertino Icons font to your application.

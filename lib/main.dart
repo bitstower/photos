@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:photos/views/video_debug.dart';
 import 'views/photo.dart';
 import 'views/album.dart';
 import 'views/vendors.dart';
@@ -8,6 +9,7 @@ import 'views/sign_up.dart';
 import 'views/setup_vendor.dart';
 import 'views/setup_access.dart';
 import 'views/image_debug.dart';
+import 'views/video_debug.dart';
 
 void main() {
   runApp(App());
@@ -91,6 +93,13 @@ class App extends StatelessWidget {
         path: '/image-debug',
         builder: (BuildContext context, GoRouterState state) {
           return const ImageDebugPage();
+        },
+      ),
+      GoRoute(
+        name: 'video_debug',
+        path: '/video-debug',
+        builder: (BuildContext context, GoRouterState state) {
+          return const VideoDebugPage();
         },
       ),
     ],
