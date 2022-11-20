@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
 import 'package:photos/services/video_optmizer.dart';
 import 'package:uuid/uuid.dart';
-import 'package:video_compress/video_compress.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../utils/ui.dart';
 
@@ -19,16 +19,16 @@ class VideoDebugPage extends StatefulWidget {
 }
 
 class _VideoDebugPageState extends State<VideoDebugPage> {
-  final _videoOptimizer = VideoOptimizer(Uuid());
+  final log = Logger('VideoDebug');
+  final _videoOptimizer = VideoOptimizer(Uuid(), FlutterVideoInfo());
 
-  int _transcodeTimeSec = 0;
-  int _videoSize = 0;
+  int _fileSize = 0;
   int _videoHeight = 0;
   int _videoWidth = 0;
-  int _videoOrientation = 0;
-  int _videoDurationSec = 0;
+  int? _videoOrientation;
+  int? _videoDurationSec;
 
-  Future<void> transcode() async {
+  Future<void> inspect() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowCompression: false,
       type: FileType.custom,
@@ -37,31 +37,25 @@ class _VideoDebugPageState extends State<VideoDebugPage> {
 
     if (result != null) {
       var src = File(result.files.single.path!);
-      MediaInfo mediaInfo1 = await _videoOptimizer.getMediaInfo(src);
 
-      setState(() {
-        _videoSize = mediaInfo1.filesize! ~/ 1000000; // MB
-        _videoHeight = mediaInfo1.height!;
-        _videoWidth = mediaInfo1.width!;
-        _videoDurationSec = mediaInfo1.duration! ~/ 1000; // seconds
-        _videoOrientation = mediaInfo1.orientation!;
-      });
-
-      var frame = await _videoOptimizer.extractFrame(src);
-      frame.copySync('/storage/emulated/0/Download/vid-thumbnail.jpg');
-
-      Stopwatch s = new Stopwatch();
+      Stopwatch s = Stopwatch();
       s.start();
 
-      var video = await _videoOptimizer.compressVideo(src, mediaInfo1);
+      var frame = await _videoOptimizer.extractFrame(src);
 
       s.stop();
 
-      video!.copySync('/storage/emulated/0/Download/vid.mp4');
-      // await VideoCompress.deleteAllCache();
+      log.info('Extract frame done, time=${s.elapsedMilliseconds} ms');
+      frame.copySync('/storage/emulated/0/Download/vid-thumbnail.jpg');
+
+      var metadata = await _videoOptimizer.getMetadata(src, frame);
 
       setState(() {
-        _transcodeTimeSec = s.elapsedMilliseconds ~/ 1000; // seconds
+        _fileSize = metadata.fileSizeInMB;
+        _videoHeight = metadata.height;
+        _videoWidth = metadata.width;
+        _videoDurationSec = metadata.durationInSec;
+        _videoOrientation = metadata.orientation;
       });
     }
   }
@@ -85,7 +79,7 @@ class _VideoDebugPageState extends State<VideoDebugPage> {
                 icon: const Icon(Icons.file_open_rounded),
                 tooltip: 'Open file',
                 onPressed: () async {
-                  transcode();
+                  inspect();
                 },
               ),
             ]),
@@ -95,8 +89,7 @@ class _VideoDebugPageState extends State<VideoDebugPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('transcode time: ${_transcodeTimeSec.toString()} s'),
-                Text('original size: ${_videoSize.toString()} MB'),
+                Text('original size: ${_fileSize.toString()} MB'),
                 Text('height: ${_videoHeight.toString()}'),
                 Text('width: ${_videoWidth.toString()}'),
                 Text('orientation: ${_videoOrientation.toString()}'),

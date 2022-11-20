@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import '../models/metadata.dart';
+import '../services/image_optimizer.dart';
 import '../utils/ui.dart';
-import 'package:exif/exif.dart';
 
 class CompressResult {
   final File file;
@@ -27,103 +27,60 @@ class ImageDebugPage extends StatefulWidget {
 }
 
 class _ImageDebugPageState extends State<ImageDebugPage> {
+  final ImageOptimizer _imageOptimizer = ImageOptimizer();
+
   File? _original;
-  CompressResult? _smallVariantResult;
-  CompressResult? _mediumVariantResult;
-  CompressResult? _largeVariantResult;
+  File? _sdImage;
+  File? _hdImage;
+  File? _qhdImage;
 
-  Future<CompressResult> compressImage(File file, int width, int height,
-      int inSampleSize, int quality, bool isPortrait) async {
-    var minWidth = isPortrait ? height : width;
-    var minHeight = isPortrait ? width : height;
-
-    var outputFile = await FlutterImageCompress.compressAndGetFile(
-      file.absolute.path,
-      '/storage/emulated/0/Download/img-${width}x${height}.jpg',
-      minWidth: minWidth,
-      minHeight: minHeight,
-      format: CompressFormat.jpeg,
-      inSampleSize: inSampleSize,
-      quality: quality,
-      keepExif: false,
+  Future<File> compressImage(
+    File src,
+    Metadata metadata,
+    ImageResolution resolution,
+  ) async {
+    var name = resolution.toString();
+    var path = '/storage/emulated/0/Download/img-$name.jpg';
+    _imageOptimizer.compress(
+      src,
+      File(path),
+      metadata,
+      resolution,
     );
 
-    return CompressResult(outputFile!, width, height);
-  }
-
-  Future<bool> isPortrait(File file) async {
-    final fileBytes = file.readAsBytesSync();
-    final exif = await readExifFromBytes(fileBytes);
-    return exif.isNotEmpty &&
-        exif['Image Orientation'].toString().contains('Rotated');
+    return File(path);
   }
 
   Future<void> createVariants() async {
     final xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     final file = File(xFile!.path);
 
-    final isPortrait = await this.isPortrait(file);
+    var metadata = await _imageOptimizer.getMetadata(file);
 
-    final smallVariantResult = await createSmallVariant(file, isPortrait);
-    final mediumVariantResult = await createMediumVariant(file, isPortrait);
-    final largeVariantResult = await createLargeVariant(file, isPortrait);
+    var sdImage = await compressImage(
+      file,
+      metadata,
+      ImageResolution.sd,
+    );
+    var hdImage = await compressImage(
+      file,
+      metadata,
+      ImageResolution.hd,
+    );
+    var qhdImage = await compressImage(
+      file,
+      metadata,
+      ImageResolution.qhd,
+    );
 
     setState(() {
       imageCache.clear();
       imageCache.clearLiveImages();
       _original = file;
-      _smallVariantResult = smallVariantResult;
-      _mediumVariantResult = mediumVariantResult;
-      _largeVariantResult = largeVariantResult;
+      _sdImage = sdImage;
+      _hdImage = hdImage;
+      _qhdImage = qhdImage;
     });
-  }
-
-  Future<CompressResult> createSmallVariant(File file, bool isPortrait) async {
-    const width = 400;
-    const height = 300;
-    const inSampleSize = 8;
-    const quality = 50;
-
-    return await compressImage(
-      file,
-      width,
-      height,
-      inSampleSize,
-      quality,
-      isPortrait,
-    );
-  }
-
-  Future<CompressResult> createMediumVariant(File file, bool isPortrait) async {
-    const width = 800;
-    const height = 600;
-    const inSampleSize = 2;
-    const quality = 50;
-
-    return await compressImage(
-      file,
-      width,
-      height,
-      inSampleSize,
-      quality,
-      isPortrait,
-    );
-  }
-
-  Future<CompressResult> createLargeVariant(File file, bool isPortrait) async {
-    const width = 2048;
-    const height = 1536;
-    const inSampleSize = 2;
-    const quality = 50;
-
-    return await compressImage(
-      file,
-      width,
-      height,
-      inSampleSize,
-      quality,
-      isPortrait,
-    );
   }
 
   @override
@@ -155,10 +112,10 @@ class _ImageDebugPageState extends State<ImageDebugPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (_smallVariantResult != null) ...[
-                  const Text('small:'),
+                if (_sdImage != null) ...[
+                  const Text('sd:'),
                   Image.file(
-                    _smallVariantResult!.file,
+                    _sdImage!,
                     key: UniqueKey(),
                     width: 150,
                     height: 150,
@@ -166,10 +123,10 @@ class _ImageDebugPageState extends State<ImageDebugPage> {
                     isAntiAlias: true,
                   ),
                 ],
-                if (_mediumVariantResult != null) ...[
-                  const Text('medium:'),
+                if (_hdImage != null) ...[
+                  const Text('hd:'),
                   Image.file(
-                    _mediumVariantResult!.file,
+                    _hdImage!,
                     key: UniqueKey(),
                     width: 300,
                     height: 300,
@@ -177,10 +134,10 @@ class _ImageDebugPageState extends State<ImageDebugPage> {
                     isAntiAlias: true,
                   ),
                 ],
-                if (_largeVariantResult != null) ...[
-                  const Text('large:'),
+                if (_qhdImage != null) ...[
+                  const Text('qhd:'),
                   Image.file(
-                    _largeVariantResult!.file,
+                    _qhdImage!,
                     key: UniqueKey(),
                     fit: BoxFit.cover,
                     isAntiAlias: true,

@@ -1,23 +1,27 @@
 import 'dart:io';
 
+import 'package:image_size_getter/file_input.dart';
+import 'package:image_size_getter/image_size_getter.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:flutter_video_info/flutter_video_info.dart';
+import '../models/video_metadata.dart';
 
 class VideoOptimizer {
-  static const int maxBitrate = 2000000; // 2 MB/s
+  final _log = Logger('VideoOptimizer');
 
-  final log = Logger('VideoOptimizer');
+  final Uuid _uuid;
+  final FlutterVideoInfo _pluginVideoInfo;
 
-  Uuid uuid;
-
-  VideoOptimizer(this.uuid);
+  VideoOptimizer(this._uuid, this._pluginVideoInfo);
 
   Future<File> extractFrame(File src) async {
     var tempDir = await getTemporaryDirectory();
-    var dstPath = '${tempDir.absolute.path}/${uuid.v4()}.jpg';
+    var dstPath = '${tempDir.absolute.path}/${_uuid.v4()}.jpg';
+
+    _log.fine('Extracting video frame, src=${src.path} dst=$dstPath');
 
     await VideoThumbnail.thumbnailFile(
       video: src.absolute.path,
@@ -29,64 +33,88 @@ class VideoOptimizer {
     return File(dstPath);
   }
 
-  Future<MediaInfo> getMediaInfo(File src) async {
-    return await VideoCompress.getMediaInfo(
-      src.absolute.path,
-    );
-  }
+  Future<VideoMetadata> getMetadata(File src, File frame) async {
+    _log.fine('Extracting embedded metadata, src=${src.path}');
 
-  Future<bool> shouldCompress(File src, MediaInfo mediaInfo) async {
-    if (!src.path.endsWith('.mp4')) {
-      log.info('Incompatible container, path=${src.path}, shouldCompress=true');
-      return true;
+    var fileMetadata = await src.stat();
+    var videoMetadata = await _pluginVideoInfo.getVideoInfo(src.absolute.path);
+
+    if (videoMetadata == null) {
+      throw Exception('File doesn\'t exist');
     }
 
-    // TODO if not incompatible video/audio codes then return true
-
-    if (mediaInfo.duration == null || mediaInfo.filesize == null) {
-      log.info('Unknown bitrate, path=${src.path}, shouldCompress=true');
-      return true;
-    }
-
-    int seconds = mediaInfo.duration! ~/ 1000;
-    int bitrate = mediaInfo.filesize! ~/ seconds;
-
-    if (bitrate > maxBitrate) {
-      log.info('Bitrate out of range, path=${src.path}, shouldCompress=true');
-      return true;
-    } else {
-      log.info('Bitrate in range, path=${src.path}, shouldCompress=false');
-      return false;
-    }
-  }
-
-  VideoQuality _matchQuality(int? width, int? height) {
+    var width = videoMetadata.width;
+    var height = videoMetadata.height;
     if (width == null || height == null) {
-      return VideoQuality.HighestQuality;
+      var size = ImageSizeGetter.getSize(FileInput(src));
+
+      _log.warning(
+        'No size in embedded metadata. Fallback to a frame size, '
+        'src=${src.path} width=${size.width} height=${size.height}',
+      );
+
+      width = size.width;
+      height = size.height;
     }
 
-    if (width >= 1920 && height >= 1080) {
-      return VideoQuality.Res1920x1080Quality;
-    } else if (width >= 1280 && height >= 720) {
-      return VideoQuality.Res1280x720Quality;
-    } else if (width >= 960 && height >= 540) {
-      return VideoQuality.Res960x540Quality;
+    int? orientation;
+
+    switch (videoMetadata.orientation) {
+      case 0:
+        orientation = 1;
+        break;
+      case 90:
+        orientation = 6;
+        break;
+      case 180:
+        orientation = 3;
+        break;
+      case 270:
+        orientation = 8;
+        break;
+      default:
+        _log.warning(
+          'Unknown orientation in embedded metadata, '
+          'src=${src.path} orientation=${videoMetadata.orientation}',
+        );
+        break;
+    }
+
+    DateTime date = fileMetadata.modified;
+
+    var dateAsStr = videoMetadata.date;
+    if (dateAsStr != null) {
+      try {
+        date = DateTime.parse(dateAsStr);
+      } on FormatException {
+        _log.warning(
+          'Unknown date format in embedded metadata. Fallback to a file date, '
+          'src=${src.path} metaDate=$dateAsStr fileDate=$date',
+        );
+      }
     } else {
-      return VideoQuality.Res640x480Quality;
+      _log.warning(
+        'No date in embedded metadata. Fallback to a file date, '
+        'src=${src.path} date=$date',
+      );
     }
-  }
 
-  Future<File?> compressVideo(File src, MediaInfo mediaInfo) async {
-    MediaInfo? results = await VideoCompress.compressVideo(
-      src.absolute.path,
-      quality: _matchQuality(mediaInfo.width, mediaInfo.height),
-      deleteOrigin: false,
+    double? duration = videoMetadata.duration;
+    if (duration == null) {
+      _log.warning('No duration in embedded metadata, src=${src.path}');
+    }
+
+    var result = VideoMetadata(
+      width,
+      height,
+      orientation,
+      fileMetadata.size,
+      date,
+      duration,
     );
 
-    if (results == null) {
-      return null;
-    } else {
-      return results.file;
-    }
+    _log.fine('Created metadata. src=${src.path} metadata=$result');
+
+    return result;
   }
 }

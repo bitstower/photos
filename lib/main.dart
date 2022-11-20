@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:photos/views/video_debug.dart';
+import 'package:logging/logging.dart';
 import 'views/photo.dart';
 import 'views/album.dart';
 import 'views/vendors.dart';
@@ -12,6 +13,21 @@ import 'views/image_debug.dart';
 import 'views/video_debug.dart';
 
 void main() {
+  if (kDebugMode) {
+    Logger.root.level = Level.FINE;
+  }
+  if (kReleaseMode) {
+    Logger.root.level = Level.WARNING;
+  }
+
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print(
+      '[${record.loggerName}] [${record.level.name}] [${record.time}] '
+      '${record.message}',
+    );
+  });
+
   runApp(App());
 }
 
