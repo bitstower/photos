@@ -1,12 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:photos/services/local_media_store.dart';
 import '../services/network_storage.dart';
 import '../utils/ui.dart';
 
-enum Menu { freeUpSpace, settings, image_debug, video_debug }
+enum Menu { freeUpSpace, settings, debug }
 
 class AlbumPage extends StatefulWidget {
   const AlbumPage({super.key});
@@ -44,10 +47,8 @@ class _AlbumPageState extends State<AlbumPage> {
               ),
               PopupMenuButton<Menu>(
                 onSelected: (Menu item) {
-                  if (item == Menu.image_debug) {
-                    GoRouter.of(context).pushNamed('image_debug');
-                  } else if (item == Menu.video_debug) {
-                    GoRouter.of(context).pushNamed('video_debug');
+                  if (item == Menu.debug) {
+                    GoRouter.of(context).push('/debug');
                   } else {
                     GoRouter.of(context).push('/sign-up');
                   }
@@ -61,14 +62,12 @@ class _AlbumPageState extends State<AlbumPage> {
                     value: Menu.settings,
                     child: Text('Settings'),
                   ),
-                  const PopupMenuItem<Menu>(
-                    value: Menu.image_debug,
-                    child: Text('Image Debug'),
-                  ),
-                  const PopupMenuItem<Menu>(
-                    value: Menu.video_debug,
-                    child: Text('Video Debug'),
-                  ),
+                  if (kDebugMode) ...[
+                    const PopupMenuItem<Menu>(
+                      value: Menu.debug,
+                      child: Text('Debug'),
+                    ),
+                  ]
                 ],
               ),
             ],
@@ -79,8 +78,8 @@ class _AlbumPageState extends State<AlbumPage> {
             backgroundColor: Colors.blueGrey,
             strokeWidth: 2.0,
             onRefresh: () async {
-              // TODO
-              return Future<void>.delayed(const Duration(seconds: 3));
+              var localMediaStore = await GetIt.I.getAsync<LocalMediaStore>();
+              await localMediaStore.synchronise();
             },
             child: DraggableScrollbar.semicircle(
               controller: _scrollController,

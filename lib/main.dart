@@ -1,7 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:photos/services/camera_roll.dart';
+import 'package:photos/services/database.dart';
+import 'package:photos/services/local_media_store.dart';
+import 'package:photos/views/debug_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'views/photo.dart';
 import 'views/album.dart';
 import 'views/vendors.dart';
@@ -9,10 +15,10 @@ import 'views/sign_in.dart';
 import 'views/sign_up.dart';
 import 'views/setup_vendor.dart';
 import 'views/setup_access.dart';
-import 'views/image_debug.dart';
-import 'views/video_debug.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   if (kDebugMode) {
     Logger.root.level = Level.FINE;
   }
@@ -28,7 +34,23 @@ void main() {
     );
   });
 
+  setup();
+
   runApp(App());
+}
+
+setup() {
+  GetIt.I.registerLazySingleton<Database>(() => Database());
+  GetIt.I.registerLazySingleton<CameraRoll>(() => CameraRoll());
+  GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
+    return await SharedPreferences.getInstance();
+  });
+  GetIt.I.registerLazySingletonAsync<LocalMediaStore>(() async {
+    var database = GetIt.I.get<Database>();
+    var cameraRoll = GetIt.I.get<CameraRoll>();
+    var options = await GetIt.I.getAsync<SharedPreferences>();
+    return LocalMediaStore(database, cameraRoll, options);
+  });
 }
 
 class App extends StatelessWidget {
@@ -105,17 +127,9 @@ class App extends StatelessWidget {
         },
       ),
       GoRoute(
-        name: 'image_debug',
-        path: '/image-debug',
+        path: '/debug',
         builder: (BuildContext context, GoRouterState state) {
-          return const ImageDebugPage();
-        },
-      ),
-      GoRoute(
-        name: 'video_debug',
-        path: '/video-debug',
-        builder: (BuildContext context, GoRouterState state) {
-          return const VideoDebugPage();
+          return const DebugPage();
         },
       ),
     ],
