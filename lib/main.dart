@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:photos/services/camera_roll.dart';
 import 'package:photos/services/database.dart';
+import 'package:photos/services/local_media_controller.dart';
 import 'package:photos/services/local_media_store.dart';
 import 'package:photos/views/debug_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,6 +51,10 @@ setup() {
     var cameraRoll = GetIt.I.get<CameraRoll>();
     var options = await GetIt.I.getAsync<SharedPreferences>();
     return LocalMediaStore(database, cameraRoll, options);
+  });
+  GetIt.I.registerLazySingleton<LocalMediaController>(() {
+    var database = GetIt.I.get<Database>();
+    return LocalMediaController(database);
   });
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:photos/services/local_media_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +31,12 @@ class _DebugPageState extends State<DebugPage> {
   Future resetConfiguration() async {
     var configuration = await GetIt.I.getAsync<SharedPreferences>();
     await configuration.clear();
+  }
+
+  Future resetCache() async {
+    imageCache.clear();
+    imageCache.clearLiveImages();
+    await PhotoManager.clearFileCache();
   }
 
   Future synchronize() async {
@@ -110,6 +117,9 @@ class _DebugPageState extends State<DebugPage> {
                   await resetDatabase();
                   refresh();
                 }
+                if (item == _Menu.resetCache) {
+                  await resetCache();
+                }
                 if (item == _Menu.synchronize) {
                   await synchronize();
                   refresh();
@@ -123,6 +133,10 @@ class _DebugPageState extends State<DebugPage> {
                 const PopupMenuItem<_Menu>(
                   value: _Menu.resetDatabase,
                   child: Text('Reset Database'),
+                ),
+                const PopupMenuItem<_Menu>(
+                  value: _Menu.resetCache,
+                  child: Text('Reset Cache'),
                 ),
                 const PopupMenuItem<_Menu>(
                   value: _Menu.synchronize,
@@ -168,4 +182,9 @@ class _Property {
   _Property(this.key, this.value);
 }
 
-enum _Menu { resetDatabase, resetConfiguration, synchronize }
+enum _Menu {
+  resetDatabase,
+  resetConfiguration,
+  resetCache,
+  synchronize,
+}

@@ -28,7 +28,7 @@ class LocalMediaStore {
     var connection = await database.open();
 
     var candidates = await connection.medias
-        .filter()
+        .where()
         .hashEqualTo(
           hash,
         )
