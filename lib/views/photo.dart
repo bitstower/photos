@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
-import '../services/network_storage.dart';
+import 'package:photos/states/gallery_state.dart';
+import 'package:photos/widgets/media_preview.dart';
+import 'package:provider/provider.dart';
 import '../utils/ui.dart';
 
 class PhotoPage extends StatefulWidget {
-  const PhotoPage({super.key, required this.photoIndex});
   final String title = 'Photo';
-  final int photoIndex;
+  final int mediaId;
+
+  const PhotoPage(this.mediaId, {super.key});
 
   @override
   State<PhotoPage> createState() => _PhotoPageState();
@@ -17,20 +18,20 @@ class PhotoPage extends StatefulWidget {
 
 showDeleteDialog(BuildContext context) {
   Widget cancelButton = TextButton(
-    child: Text("Cancel"),
+    child: const Text("Cancel"),
     onPressed: () {
       Navigator.of(context).pop();
     },
   );
   Widget deleteButton = TextButton(
-    child: Text("Delete"),
+    child: const Text("Delete"),
     onPressed: () {
       Navigator.of(context).pop();
     },
   );
   AlertDialog alert = AlertDialog(
-    title: Text("Confirm"),
-    content: Text("Are you sure to delete this file?"),
+    title: const Text("Confirm"),
+    content: const Text("Are you sure to delete this file?"),
     actions: [
       cancelButton,
       deleteButton,
@@ -46,29 +47,14 @@ showDeleteDialog(BuildContext context) {
 }
 
 class _PhotoPageState extends State<PhotoPage> {
-  final networkStorage = buildNetworkStorage();
-
-  ImageProvider buildImageProvider(int photoIndex) {
-    final filePath = '/dataset/$photoIndex.jpg';
-    final fileUrl = networkStorage.buildUrl(filePath);
-    return CachedNetworkImageProvider(fileUrl, cacheKey: filePath);
-  }
-
-  int getTotalCount() {
-    return 25;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final PageController controller = PageController(
-      initialPage: widget.photoIndex,
-    );
+    var mediaIds = context.watch<GalleryState>().mediaIds;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: Ui.lightNavigationBar(),
       child: Scaffold(
         backgroundColor: Colors.black,
-        // extendBodyBehindAppBar: true,
         appBar: AppBar(
           systemOverlayStyle: Ui.lightStatusBar(),
           backgroundColor: Colors.transparent,
@@ -81,19 +67,14 @@ class _PhotoPageState extends State<PhotoPage> {
           ),
         ),
         body: PageView.builder(
-          controller: controller,
+          controller: PageController(
+            initialPage: mediaIds.indexOf(widget.mediaId),
+          ),
           clipBehavior: Clip.none,
           itemBuilder: (context, index) {
-            return PhotoViewGestureDetectorScope(
-              axis: Axis.horizontal,
-              child: PhotoView(
-                imageProvider: buildImageProvider(index),
-                minScale: PhotoViewComputedScale.contained,
-                maxScale: PhotoViewComputedScale.covered * 2,
-              ),
-            );
+            return MediaPreview(mediaIds[index]);
           },
-          itemCount: getTotalCount(),
+          itemCount: mediaIds.length,
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[

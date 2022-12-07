@@ -4,8 +4,8 @@ import '../models/media.dart';
 class Database {
   Isar? _instance;
 
-  Future<Isar> open() async {
-    return _instance ??= await Isar.open([MediaSchema]);
+  Isar open() {
+    return _instance ??= Isar.openSync([MediaSchema]);
   }
 
   Future<void> close() async {

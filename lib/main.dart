@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:photos/services/camera_roll.dart';
 import 'package:photos/services/database.dart';
-import 'package:photos/services/local_media_controller.dart';
+import 'package:photos/services/media_controller.dart';
 import 'package:photos/services/local_media_store.dart';
+import 'package:photos/states/gallery_state.dart';
 import 'package:photos/views/debug_page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'views/photo.dart';
 import 'views/album.dart';
@@ -35,12 +37,21 @@ void main() async {
     );
   });
 
-  setup();
+  initDependencies();
 
-  runApp(App());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<GalleryState>(
+          create: (_) => createGalleryState(),
+        ),
+      ],
+      child: App(),
+    ),
+  );
 }
 
-setup() {
+initDependencies() {
   GetIt.I.registerLazySingleton<Database>(() => Database());
   GetIt.I.registerLazySingleton<CameraRoll>(() => CameraRoll());
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
@@ -52,10 +63,15 @@ setup() {
     var options = await GetIt.I.getAsync<SharedPreferences>();
     return LocalMediaStore(database, cameraRoll, options);
   });
-  GetIt.I.registerLazySingleton<LocalMediaController>(() {
+  GetIt.I.registerLazySingleton<MediaController>(() {
     var database = GetIt.I.get<Database>();
-    return LocalMediaController(database);
+    return MediaController(database);
   });
+}
+
+GalleryState createGalleryState() {
+  var controller = GetIt.I.get<MediaController>();
+  return GalleryState()..mediaIds = controller.getIdsSync();
 }
 
 class App extends StatelessWidget {
@@ -90,12 +106,10 @@ class App extends StatelessWidget {
         },
         routes: [
           GoRoute(
-            path: 'photo/:photoIndex',
+            path: 'media/:id',
             builder: (BuildContext context, GoRouterState state) {
               return PhotoPage(
-                photoIndex: int.parse(
-                  state.params['photoIndex']!,
-                ),
+                int.parse(state.params['id']!),
               );
             },
           ),
