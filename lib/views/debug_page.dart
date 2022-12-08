@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photos/services/local_media_store.dart';
+import 'package:photos/services/local_media_replicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/media.dart';
@@ -22,7 +22,7 @@ class _DebugPageState extends State<DebugPage> {
 
   Future resetDatabase() async {
     var database = GetIt.I.get<Database>();
-    var connection = await database.open();
+    var connection = database.open();
     await connection.writeTxn(() async {
       await connection.clear();
     });
@@ -40,13 +40,13 @@ class _DebugPageState extends State<DebugPage> {
   }
 
   Future synchronize() async {
-    var localMediaStore = await GetIt.I.getAsync<LocalMediaStore>();
-    await localMediaStore.synchronise();
+    var localMediaStore = await GetIt.I.getAsync<LocalMediaReplicator>();
+    await localMediaStore.replicate();
   }
 
   Future<List<_Property>> loadCfgProps() async {
     var c = await GetIt.I.getAsync<SharedPreferences>();
-    var kMinCreateDateSecondKey = LocalMediaStore.kMinCreateDateSecondKey;
+    var kMinCreateDateSecondKey = LocalMediaReplicator.kMinCreateDateSecondKey;
     return [
       _Property(
         kMinCreateDateSecondKey,
@@ -57,14 +57,22 @@ class _DebugPageState extends State<DebugPage> {
 
   Future<List<_Property>> loadDbProps() async {
     var database = GetIt.I.get<Database>();
-    var connection = await database.open();
+    var connection = database.open();
 
     var mediasCount = await connection.medias.count();
+    var dbSize = await connection.getSize(
+      includeIndexes: true,
+      includeLinks: true,
+    );
 
     return [
       _Property(
-        'medias.count',
+        'db.medias.count',
         mediasCount.toString(),
+      ),
+      _Property(
+        'db.sizeInBytes',
+        dbSize.toString(),
       ),
     ];
   }

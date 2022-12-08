@@ -31,24 +31,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_network_image:
   crypto:
   go_router:
   photo_view:
   url_launcher:
   carousel_slider:
   draggable_scrollbar:
-  flutter_image_compress:
-  video_thumbnail:
-  image_picker:
-  file_picker:
   path_provider:
   uuid:
   logging:
-  exif:
-  image_size_getter:
-  flutter_video_info:
-  intl:
   msgpack_dart:
   photo_manager:
   shared_preferences:

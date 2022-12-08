@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:photos/services/camera_roll.dart';
 import 'package:photos/services/database.dart';
 import 'package:photos/services/media_controller.dart';
-import 'package:photos/services/local_media_store.dart';
+import 'package:photos/services/local_media_replicator.dart';
 import 'package:photos/states/gallery_state.dart';
 import 'package:photos/views/debug_page.dart';
 import 'package:provider/provider.dart';
@@ -57,11 +57,11 @@ initDependencies() {
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
     return await SharedPreferences.getInstance();
   });
-  GetIt.I.registerLazySingletonAsync<LocalMediaStore>(() async {
+  GetIt.I.registerLazySingletonAsync<LocalMediaReplicator>(() async {
     var database = GetIt.I.get<Database>();
     var cameraRoll = GetIt.I.get<CameraRoll>();
     var options = await GetIt.I.getAsync<SharedPreferences>();
-    return LocalMediaStore(database, cameraRoll, options);
+    return LocalMediaReplicator(database, cameraRoll, options);
   });
   GetIt.I.registerLazySingleton<MediaController>(() {
     var database = GetIt.I.get<Database>();
