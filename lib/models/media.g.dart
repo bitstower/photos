@@ -17,53 +17,63 @@ const MediaSchema = CollectionSchema(
   name: r'Media',
   id: 6434281596432674333,
   properties: {
-    r'duration': PropertySchema(
+    r'deleted': PropertySchema(
       id: 0,
+      name: r'deleted',
+      type: IsarType.bool,
+    ),
+    r'duration': PropertySchema(
+      id: 1,
       name: r'duration',
       type: IsarType.int,
     ),
     r'hash': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'hash',
       type: IsarType.long,
     ),
     r'localOrigin': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'localOrigin',
       type: IsarType.object,
       target: r'LocalAsset',
     ),
     r'orientatedHeight': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'orientatedHeight',
       type: IsarType.int,
     ),
     r'orientatedWidth': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'orientatedWidth',
       type: IsarType.int,
     ),
     r'orientation': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'orientation',
       type: IsarType.int,
     ),
     r'remoteOrigin': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'remoteOrigin',
       type: IsarType.object,
       target: r'RemoteAsset',
     ),
     r'taken': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'taken',
       type: IsarType.long,
     ),
     r'type': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'type',
       type: IsarType.byte,
       enumMap: _MediatypeEnumValueMap,
+    ),
+    r'uploaded': PropertySchema(
+      id: 10,
+      name: r'uploaded',
+      type: IsarType.bool,
     )
   },
   estimateSize: _mediaEstimateSize,
@@ -80,6 +90,32 @@ const MediaSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'taken',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'deleted': IndexSchema(
+      id: 2416515181749931262,
+      name: r'deleted',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'deleted',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'uploaded': IndexSchema(
+      id: 4523767140989849088,
+      name: r'uploaded',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'uploaded',
           type: IndexType.value,
           caseSensitive: false,
         )
@@ -141,25 +177,27 @@ void _mediaSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeInt(offsets[0], object.duration);
-  writer.writeLong(offsets[1], object.hash);
+  writer.writeBool(offsets[0], object.deleted);
+  writer.writeInt(offsets[1], object.duration);
+  writer.writeLong(offsets[2], object.hash);
   writer.writeObject<LocalAsset>(
-    offsets[2],
+    offsets[3],
     allOffsets,
     LocalAssetSchema.serialize,
     object.localOrigin,
   );
-  writer.writeInt(offsets[3], object.orientatedHeight);
-  writer.writeInt(offsets[4], object.orientatedWidth);
-  writer.writeInt(offsets[5], object.orientation);
+  writer.writeInt(offsets[4], object.orientatedHeight);
+  writer.writeInt(offsets[5], object.orientatedWidth);
+  writer.writeInt(offsets[6], object.orientation);
   writer.writeObject<RemoteAsset>(
-    offsets[6],
+    offsets[7],
     allOffsets,
     RemoteAssetSchema.serialize,
     object.remoteOrigin,
   );
-  writer.writeLong(offsets[7], object.taken);
-  writer.writeByte(offsets[8], object.type.value);
+  writer.writeLong(offsets[8], object.taken);
+  writer.writeByte(offsets[9], object.type.value);
+  writer.writeBool(offsets[10], object.uploaded);
 }
 
 Media _mediaDeserialize(
@@ -169,24 +207,26 @@ Media _mediaDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Media();
-  object.duration = reader.readInt(offsets[0]);
+  object.deleted = reader.readBool(offsets[0]);
+  object.duration = reader.readInt(offsets[1]);
   object.id = id;
   object.localOrigin = reader.readObjectOrNull<LocalAsset>(
-    offsets[2],
+    offsets[3],
     LocalAssetSchema.deserialize,
     allOffsets,
   );
-  object.orientatedHeight = reader.readInt(offsets[3]);
-  object.orientatedWidth = reader.readInt(offsets[4]);
-  object.orientation = reader.readInt(offsets[5]);
+  object.orientatedHeight = reader.readInt(offsets[4]);
+  object.orientatedWidth = reader.readInt(offsets[5]);
+  object.orientation = reader.readInt(offsets[6]);
   object.remoteOrigin = reader.readObjectOrNull<RemoteAsset>(
-    offsets[6],
+    offsets[7],
     RemoteAssetSchema.deserialize,
     allOffsets,
   );
-  object.taken = reader.readLong(offsets[7]);
-  object.type = _MediatypeValueEnumMap[reader.readByteOrNull(offsets[8])] ??
+  object.taken = reader.readLong(offsets[8]);
+  object.type = _MediatypeValueEnumMap[reader.readByteOrNull(offsets[9])] ??
       MediaType.image;
+  object.uploaded = reader.readBool(offsets[10]);
   return object;
 }
 
@@ -198,32 +238,36 @@ P _mediaDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readInt(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
+      return (reader.readInt(offset)) as P;
     case 2:
+      return (reader.readLong(offset)) as P;
+    case 3:
       return (reader.readObjectOrNull<LocalAsset>(
         offset,
         LocalAssetSchema.deserialize,
         allOffsets,
       )) as P;
-    case 3:
-      return (reader.readInt(offset)) as P;
     case 4:
       return (reader.readInt(offset)) as P;
     case 5:
       return (reader.readInt(offset)) as P;
     case 6:
+      return (reader.readInt(offset)) as P;
+    case 7:
       return (reader.readObjectOrNull<RemoteAsset>(
         offset,
         RemoteAssetSchema.deserialize,
         allOffsets,
       )) as P;
-    case 7:
-      return (reader.readLong(offset)) as P;
     case 8:
+      return (reader.readLong(offset)) as P;
+    case 9:
       return (_MediatypeValueEnumMap[reader.readByteOrNull(offset)] ??
           MediaType.image) as P;
+    case 10:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -261,6 +305,22 @@ extension MediaQueryWhereSort on QueryBuilder<Media, Media, QWhere> {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'taken'),
+      );
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhere> anyDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'deleted'),
+      );
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhere> anyUploaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'uploaded'),
       );
     });
   }
@@ -428,6 +488,94 @@ extension MediaQueryWhere on QueryBuilder<Media, Media, QWhereClause> {
     });
   }
 
+  QueryBuilder<Media, Media, QAfterWhereClause> deletedEqualTo(bool deleted) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'deleted',
+        value: [deleted],
+      ));
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhereClause> deletedNotEqualTo(
+      bool deleted) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deleted',
+              lower: [],
+              upper: [deleted],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deleted',
+              lower: [deleted],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deleted',
+              lower: [deleted],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deleted',
+              lower: [],
+              upper: [deleted],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhereClause> uploadedEqualTo(bool uploaded) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'uploaded',
+        value: [uploaded],
+      ));
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhereClause> uploadedNotEqualTo(
+      bool uploaded) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded',
+              lower: [],
+              upper: [uploaded],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded',
+              lower: [uploaded],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded',
+              lower: [uploaded],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded',
+              lower: [],
+              upper: [uploaded],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
   QueryBuilder<Media, Media, QAfterWhereClause> hashEqualTo(int hash) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
@@ -518,6 +666,15 @@ extension MediaQueryWhere on QueryBuilder<Media, Media, QWhereClause> {
 }
 
 extension MediaQueryFilter on QueryBuilder<Media, Media, QFilterCondition> {
+  QueryBuilder<Media, Media, QAfterFilterCondition> deletedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'deleted',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Media, Media, QAfterFilterCondition> durationEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -969,6 +1126,16 @@ extension MediaQueryFilter on QueryBuilder<Media, Media, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Media, Media, QAfterFilterCondition> uploadedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'uploaded',
+        value: value,
+      ));
+    });
+  }
 }
 
 extension MediaQueryObject on QueryBuilder<Media, Media, QFilterCondition> {
@@ -990,6 +1157,18 @@ extension MediaQueryObject on QueryBuilder<Media, Media, QFilterCondition> {
 extension MediaQueryLinks on QueryBuilder<Media, Media, QFilterCondition> {}
 
 extension MediaQuerySortBy on QueryBuilder<Media, Media, QSortBy> {
+  QueryBuilder<Media, Media, QAfterSortBy> sortByDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterSortBy> sortByDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deleted', Sort.desc);
+    });
+  }
+
   QueryBuilder<Media, Media, QAfterSortBy> sortByDuration() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'duration', Sort.asc);
@@ -1073,9 +1252,33 @@ extension MediaQuerySortBy on QueryBuilder<Media, Media, QSortBy> {
       return query.addSortBy(r'type', Sort.desc);
     });
   }
+
+  QueryBuilder<Media, Media, QAfterSortBy> sortByUploaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uploaded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterSortBy> sortByUploadedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uploaded', Sort.desc);
+    });
+  }
 }
 
 extension MediaQuerySortThenBy on QueryBuilder<Media, Media, QSortThenBy> {
+  QueryBuilder<Media, Media, QAfterSortBy> thenByDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterSortBy> thenByDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deleted', Sort.desc);
+    });
+  }
+
   QueryBuilder<Media, Media, QAfterSortBy> thenByDuration() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'duration', Sort.asc);
@@ -1171,9 +1374,27 @@ extension MediaQuerySortThenBy on QueryBuilder<Media, Media, QSortThenBy> {
       return query.addSortBy(r'type', Sort.desc);
     });
   }
+
+  QueryBuilder<Media, Media, QAfterSortBy> thenByUploaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uploaded', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterSortBy> thenByUploadedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'uploaded', Sort.desc);
+    });
+  }
 }
 
 extension MediaQueryWhereDistinct on QueryBuilder<Media, Media, QDistinct> {
+  QueryBuilder<Media, Media, QDistinct> distinctByDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'deleted');
+    });
+  }
+
   QueryBuilder<Media, Media, QDistinct> distinctByDuration() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'duration');
@@ -1215,12 +1436,24 @@ extension MediaQueryWhereDistinct on QueryBuilder<Media, Media, QDistinct> {
       return query.addDistinctBy(r'type');
     });
   }
+
+  QueryBuilder<Media, Media, QDistinct> distinctByUploaded() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'uploaded');
+    });
+  }
 }
 
 extension MediaQueryProperty on QueryBuilder<Media, Media, QQueryProperty> {
   QueryBuilder<Media, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Media, bool, QQueryOperations> deletedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'deleted');
     });
   }
 
@@ -1275,6 +1508,12 @@ extension MediaQueryProperty on QueryBuilder<Media, Media, QQueryProperty> {
   QueryBuilder<Media, MediaType, QQueryOperations> typeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'type');
+    });
+  }
+
+  QueryBuilder<Media, bool, QQueryOperations> uploadedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'uploaded');
     });
   }
 }

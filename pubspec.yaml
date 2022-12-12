@@ -45,6 +45,7 @@ dependencies:
   shared_preferences:
   get_it:
   provider: ^6.0.0
+  meta:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

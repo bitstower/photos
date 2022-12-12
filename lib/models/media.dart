@@ -34,6 +34,12 @@ class Media {
   LocalAsset? localOrigin;
   RemoteAsset? remoteOrigin;
 
+  @Index()
+  late bool deleted;
+
+  @Index()
+  late bool uploaded;
+
   // final remoteSdThumbnail = IsarLink<RemoteAsset>();
   // final remoteQhdThumbnail = IsarLink<RemoteAsset>();
 
@@ -46,6 +52,8 @@ class Media {
       ..orientatedHeight = entity.orientatedHeight
       ..orientation = entity.orientation
       ..duration = entity.duration
+      ..deleted = false
+      ..uploaded = false
       ..localOrigin = LocalAsset.fromLocalMediaStore(entity);
   }
 }

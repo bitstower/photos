@@ -12,7 +12,7 @@ import '../utils/image.dart';
 class MediaPreview extends StatefulWidget {
   final int mediaId;
 
-  MediaPreview(this.mediaId, {super.key});
+  const MediaPreview(this.mediaId, {super.key});
 
   @override
   State<MediaPreview> createState() => _MediaPreviewState();
