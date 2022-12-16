@@ -3,14 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:photos/services/camera_roll.dart';
-import 'package:photos/services/database.dart';
-import 'package:photos/services/media_controller.dart';
-import 'package:photos/services/local_media_replicator.dart';
-import 'package:photos/states/gallery_state.dart';
-import 'package:photos/views/debug_page.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'views/photo.dart';
 import 'views/album.dart';
 import 'views/vendors.dart';
@@ -18,6 +12,10 @@ import 'views/sign_in.dart';
 import 'views/sign_up.dart';
 import 'views/setup_vendor.dart';
 import 'views/setup_access.dart';
+import 'views/debug_page.dart';
+import 'services/media_controller.dart';
+import 'states/gallery_state.dart';
+import 'deps.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,24 +47,6 @@ void main() async {
       child: App(),
     ),
   );
-}
-
-initDependencies() {
-  GetIt.I.registerLazySingleton<Database>(() => Database());
-  GetIt.I.registerLazySingleton<CameraRoll>(() => CameraRoll());
-  GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
-    return await SharedPreferences.getInstance();
-  });
-  GetIt.I.registerLazySingletonAsync<LocalMediaReplicator>(() async {
-    var database = GetIt.I.get<Database>();
-    var cameraRoll = GetIt.I.get<CameraRoll>();
-    var options = await GetIt.I.getAsync<SharedPreferences>();
-    return LocalMediaReplicator(database, cameraRoll, options);
-  });
-  GetIt.I.registerLazySingleton<MediaController>(() {
-    var database = GetIt.I.get<Database>();
-    return MediaController(database);
-  });
 }
 
 GalleryState createGalleryState() {

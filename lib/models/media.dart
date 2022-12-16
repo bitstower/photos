@@ -37,7 +37,7 @@ class Media {
   @Index()
   late bool deleted;
 
-  @Index()
+  @Index(composite: [CompositeIndex('deleted')])
   late bool uploaded;
 
   // final remoteSdThumbnail = IsarLink<RemoteAsset>();

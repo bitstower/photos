@@ -1,3 +1,5 @@
+import 'image_size.dart';
+
 enum ImageResolution {
   sd(360, 50),
   hd(720, 50),
@@ -9,8 +11,10 @@ enum ImageResolution {
   const ImageResolution(this.height, this.quality);
 
   ImageSize findClosestSize(
-    ImageSize size,
+    ImageSize orientatedSize,
   ) {
+    var size = orientatedSize;
+
     // change to landscape if needed
     var flipped = false;
     if (size.isPortrait) {
@@ -37,17 +41,4 @@ enum ImageResolution {
   String toString() {
     return name;
   }
-}
-
-class ImageSize {
-  final int width;
-  final int height;
-
-  const ImageSize(this.width, this.height);
-
-  double get ratio => width / height;
-
-  bool get isPortrait => height > width;
-
-  ImageSize flip() => ImageSize(height, width);
 }

@@ -1,9 +1,11 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'package:meta/meta.dart';
 import 'package:photos/services/database.dart';
 
 import '../models/jar.dart';
 
+@sealed
 class JarDao {
   final Database database;
 

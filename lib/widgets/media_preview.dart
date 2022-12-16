@@ -1,13 +1,11 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../services/media_controller.dart';
-import '../utils/image.dart';
+import '../utils/image_resolution.dart';
+import '../utils/image_size.dart';
 
 class MediaPreview extends StatefulWidget {
   final int mediaId;

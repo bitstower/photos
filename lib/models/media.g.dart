@@ -108,14 +108,19 @@ const MediaSchema = CollectionSchema(
         )
       ],
     ),
-    r'uploaded': IndexSchema(
-      id: 4523767140989849088,
-      name: r'uploaded',
+    r'uploaded_deleted': IndexSchema(
+      id: 5013418922836625867,
+      name: r'uploaded_deleted',
       unique: false,
       replace: false,
       properties: [
         IndexPropertySchema(
           name: r'uploaded',
+          type: IndexType.value,
+          caseSensitive: false,
+        ),
+        IndexPropertySchema(
+          name: r'deleted',
           type: IndexType.value,
           caseSensitive: false,
         )
@@ -317,10 +322,10 @@ extension MediaQueryWhereSort on QueryBuilder<Media, Media, QWhere> {
     });
   }
 
-  QueryBuilder<Media, Media, QAfterWhere> anyUploaded() {
+  QueryBuilder<Media, Media, QAfterWhere> anyUploadedDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'uploaded'),
+        const IndexWhereClause.any(indexName: r'uploaded_deleted'),
       );
     });
   }
@@ -532,28 +537,29 @@ extension MediaQueryWhere on QueryBuilder<Media, Media, QWhereClause> {
     });
   }
 
-  QueryBuilder<Media, Media, QAfterWhereClause> uploadedEqualTo(bool uploaded) {
+  QueryBuilder<Media, Media, QAfterWhereClause> uploadedEqualToAnyDeleted(
+      bool uploaded) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'uploaded',
+        indexName: r'uploaded_deleted',
         value: [uploaded],
       ));
     });
   }
 
-  QueryBuilder<Media, Media, QAfterWhereClause> uploadedNotEqualTo(
+  QueryBuilder<Media, Media, QAfterWhereClause> uploadedNotEqualToAnyDeleted(
       bool uploaded) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uploaded',
+              indexName: r'uploaded_deleted',
               lower: [],
               upper: [uploaded],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uploaded',
+              indexName: r'uploaded_deleted',
               lower: [uploaded],
               includeLower: false,
               upper: [],
@@ -561,15 +567,60 @@ extension MediaQueryWhere on QueryBuilder<Media, Media, QWhereClause> {
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uploaded',
+              indexName: r'uploaded_deleted',
               lower: [uploaded],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'uploaded',
+              indexName: r'uploaded_deleted',
               lower: [],
               upper: [uploaded],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhereClause> uploadedDeletedEqualTo(
+      bool uploaded, bool deleted) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'uploaded_deleted',
+        value: [uploaded, deleted],
+      ));
+    });
+  }
+
+  QueryBuilder<Media, Media, QAfterWhereClause>
+      uploadedEqualToDeletedNotEqualTo(bool uploaded, bool deleted) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded_deleted',
+              lower: [uploaded],
+              upper: [uploaded, deleted],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded_deleted',
+              lower: [uploaded, deleted],
+              includeLower: false,
+              upper: [uploaded],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded_deleted',
+              lower: [uploaded, deleted],
+              includeLower: false,
+              upper: [uploaded],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'uploaded_deleted',
+              lower: [uploaded],
+              upper: [uploaded, deleted],
               includeUpper: false,
             ));
       }
