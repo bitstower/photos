@@ -23,8 +23,8 @@ class OriginAssetStep extends AssetStep {
     final mediaId = context.getMediaId();
     assert(mediaId != null);
 
-    final connection = database.open();
-    final media = await connection.medias.get(mediaId!);
+    final conn = database.open();
+    final media = await conn.medias.get(mediaId!);
 
     final localId = media?.localOrigin?.localId;
     assert(localId != null);
@@ -34,6 +34,8 @@ class OriginAssetStep extends AssetStep {
 
     final localFile = await localAsset?.originFile;
     assert(localFile != null);
+
+    log.info('Accessed origin file, mediaId=$mediaId localId=$localId');
 
     return localFile!;
   }

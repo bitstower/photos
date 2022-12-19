@@ -8,7 +8,7 @@ abstract class Context {
   final int _jarId;
   final JarDao _jarDao;
 
-  late Map<String, dynamic> _data;
+  late Map<dynamic, dynamic> _data;
 
   bool _initialized = false;
 

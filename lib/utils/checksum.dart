@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:meta/meta.dart';
 
+@sealed
 class Checksum {
   const Checksum();
 

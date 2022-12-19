@@ -64,6 +64,13 @@ class ThumbAssetStep extends AssetStep {
       flush: true,
     );
 
+    log.info(
+      'Generated thumbnail, '
+      'mediaId=$mediaId localId=$localId '
+      'width=${thumbSize.width} height=${thumbSize.height} '
+      'bytes=${thumbBytes.lengthInBytes}',
+    );
+
     return thumbFile;
   }
 

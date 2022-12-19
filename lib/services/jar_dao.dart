@@ -7,21 +7,21 @@ import '../models/jar.dart';
 
 @sealed
 class JarDao {
-  final Database database;
+  final Database _database;
 
-  JarDao(this.database);
+  JarDao(this._database);
 
   Future<Jar?> getById(int id) async {
-    var connection = database.open();
-    return await connection.jars.get(id);
+    var conn = _database.open();
+    return await conn.jars.get(id);
   }
 
   Future put(Jar jar) async {
     assert(jar.id != null);
     assert(jar.payload != null);
-    var connection = database.open();
-    await connection.writeTxn(() async {
-      await connection.jars.put(jar);
+    var conn = _database.open();
+    await conn.writeTxn(() async {
+      await conn.jars.put(jar);
     });
   }
 }

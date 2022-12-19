@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 class TmpDir {
   const TmpDir();
 
-  getFile(String name, String extension) async {
+  Future<File> getFile(String name, String extension) async {
     final tempDir = await getTemporaryDirectory();
     return File('${tempDir.path}/$name.$extension');
   }

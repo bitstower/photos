@@ -1781,24 +1781,24 @@ const RemoteAssetSchema = Schema(
   name: r'RemoteAsset',
   id: -962630459024812197,
   properties: {
-    r'checksum': PropertySchema(
-      id: 0,
-      name: r'checksum',
-      type: IsarType.byteList,
-    ),
     r'fileSize': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'fileSize',
       type: IsarType.long,
     ),
     r'fileType': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'fileType',
       type: IsarType.string,
     ),
-    r'secret': PropertySchema(
+    r'secretHeader': PropertySchema(
+      id: 2,
+      name: r'secretHeader',
+      type: IsarType.byteList,
+    ),
+    r'secretKey': PropertySchema(
       id: 3,
-      name: r'secret',
+      name: r'secretKey',
       type: IsarType.byteList,
     ),
     r'uuid': PropertySchema(
@@ -1819,9 +1819,9 @@ int _remoteAssetEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.checksum.length;
   bytesCount += 3 + object.fileType.length * 3;
-  bytesCount += 3 + object.secret.length;
+  bytesCount += 3 + object.secretHeader.length;
+  bytesCount += 3 + object.secretKey.length;
   bytesCount += 3 + object.uuid.length * 3;
   return bytesCount;
 }
@@ -1832,10 +1832,10 @@ void _remoteAssetSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeByteList(offsets[0], object.checksum);
-  writer.writeLong(offsets[1], object.fileSize);
-  writer.writeString(offsets[2], object.fileType);
-  writer.writeByteList(offsets[3], object.secret);
+  writer.writeLong(offsets[0], object.fileSize);
+  writer.writeString(offsets[1], object.fileType);
+  writer.writeByteList(offsets[2], object.secretHeader);
+  writer.writeByteList(offsets[3], object.secretKey);
   writer.writeString(offsets[4], object.uuid);
 }
 
@@ -1846,10 +1846,10 @@ RemoteAsset _remoteAssetDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = RemoteAsset();
-  object.checksum = reader.readByteList(offsets[0]) ?? [];
-  object.fileSize = reader.readLong(offsets[1]);
-  object.fileType = reader.readString(offsets[2]);
-  object.secret = reader.readByteList(offsets[3]) ?? [];
+  object.fileSize = reader.readLong(offsets[0]);
+  object.fileType = reader.readString(offsets[1]);
+  object.secretHeader = reader.readByteList(offsets[2]) ?? [];
+  object.secretKey = reader.readByteList(offsets[3]) ?? [];
   object.uuid = reader.readString(offsets[4]);
   return object;
 }
@@ -1862,11 +1862,11 @@ P _remoteAssetDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readByteList(offset) ?? []) as P;
-    case 1:
       return (reader.readLong(offset)) as P;
-    case 2:
+    case 1:
       return (reader.readString(offset)) as P;
+    case 2:
+      return (reader.readByteList(offset) ?? []) as P;
     case 3:
       return (reader.readByteList(offset) ?? []) as P;
     case 4:
@@ -1878,151 +1878,6 @@ P _remoteAssetDeserializeProp<P>(
 
 extension RemoteAssetQueryFilter
     on QueryBuilder<RemoteAsset, RemoteAsset, QFilterCondition> {
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumElementEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'checksum',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumElementGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'checksum',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumElementLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'checksum',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumElementBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'checksum',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        0,
-        true,
-        0,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        0,
-        false,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        0,
-        true,
-        length,
-        include,
-      );
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      checksumLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'checksum',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
-    });
-  }
-
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition> fileSizeEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -2214,45 +2069,45 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretElementEqualTo(int value) {
+      secretHeaderElementEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'secret',
+        property: r'secretHeader',
         value: value,
       ));
     });
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretElementGreaterThan(
+      secretHeaderElementGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'secret',
+        property: r'secretHeader',
         value: value,
       ));
     });
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretElementLessThan(
+      secretHeaderElementLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'secret',
+        property: r'secretHeader',
         value: value,
       ));
     });
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretElementBetween(
+      secretHeaderElementBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -2260,7 +2115,7 @@ extension RemoteAssetQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'secret',
+        property: r'secretHeader',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -2270,10 +2125,10 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretLengthEqualTo(int length) {
+      secretHeaderLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
         length,
         true,
         length,
@@ -2283,10 +2138,10 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretIsEmpty() {
+      secretHeaderIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
         0,
         true,
         0,
@@ -2296,10 +2151,10 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretIsNotEmpty() {
+      secretHeaderIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
         0,
         false,
         999999,
@@ -2309,13 +2164,13 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretLengthLessThan(
+      secretHeaderLengthLessThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
         0,
         true,
         length,
@@ -2325,13 +2180,13 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretLengthGreaterThan(
+      secretHeaderLengthGreaterThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
         length,
         include,
         999999,
@@ -2341,7 +2196,7 @@ extension RemoteAssetQueryFilter
   }
 
   QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
-      secretLengthBetween(
+      secretHeaderLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -2349,7 +2204,152 @@ extension RemoteAssetQueryFilter
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
-        r'secret',
+        r'secretHeader',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'secretKey',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'secretKey',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'secretKey',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'secretKey',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RemoteAsset, RemoteAsset, QAfterFilterCondition>
+      secretKeyLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'secretKey',
         lower,
         includeLower,
         upper,

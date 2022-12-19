@@ -1,5 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photos/jobs/post_media/asset_step_result.dart';
 
 part 'media.g.dart';
 
@@ -34,14 +35,13 @@ class Media {
   LocalAsset? localOrigin;
   RemoteAsset? remoteOrigin;
 
+  // checksum
+
   @Index()
   late bool deleted;
 
   @Index(composite: [CompositeIndex('deleted')])
   late bool uploaded;
-
-  // final remoteSdThumbnail = IsarLink<RemoteAsset>();
-  // final remoteQhdThumbnail = IsarLink<RemoteAsset>();
 
   static Media fromLocalMediaStore(AssetEntity entity) {
     assert(entity.createDateSecond != null);
@@ -73,8 +73,8 @@ class LocalAsset {
 @embedded
 class RemoteAsset {
   late String uuid; // v4
-  late List<byte> secret; // aes
-  late List<byte> checksum; // md5
+  late List<byte> secretKey;
+  late List<byte> secretHeader;
   late String fileType; // mime type
   late int fileSize; // bytes
 }

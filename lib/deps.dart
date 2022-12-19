@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:photos/jobs/post_media/broadcast_step.dart';
 import 'package:photos/jobs/post_media/post_media_job.dart';
+import 'package:photos/services/media_dao.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,6 +31,10 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return JarDao(database);
   });
+  GetIt.I.registerLazySingleton<MediaDao>(() {
+    var database = GetIt.I.get<Database>();
+    return MediaDao(database);
+  });
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
     return await SharedPreferences.getInstance();
   });
@@ -41,21 +47,6 @@ initDependencies() {
   GetIt.I.registerLazySingleton<MediaController>(() {
     var database = GetIt.I.get<Database>();
     return MediaController(database);
-  });
-  GetIt.I.registerLazySingleton<OriginAssetStep>(() {
-    var database = GetIt.I.get<Database>();
-    var secretBox = GetIt.I.get<SecretBox>();
-    var uuid = GetIt.I.get<Uuid>();
-    var checksum = GetIt.I.get<Checksum>();
-    var tmpDir = GetIt.I.get<TmpDir>();
-
-    return OriginAssetStep(
-      database,
-      secretBox,
-      uuid,
-      checksum,
-      tmpDir,
-    );
   });
   GetIt.I.registerLazySingleton<ThumbAssetStep>(
     () {
@@ -114,13 +105,31 @@ initDependencies() {
     },
     instanceName: 'lgThumbAssetStep',
   );
+  GetIt.I.registerLazySingleton<OriginAssetStep>(() {
+    var database = GetIt.I.get<Database>();
+    var secretBox = GetIt.I.get<SecretBox>();
+    var uuid = GetIt.I.get<Uuid>();
+    var checksum = GetIt.I.get<Checksum>();
+    var tmpDir = GetIt.I.get<TmpDir>();
+
+    return OriginAssetStep(
+      database,
+      secretBox,
+      uuid,
+      checksum,
+      tmpDir,
+    );
+  });
+  GetIt.I.registerLazySingleton<BroadcastStep>(() {
+    var mediaDao = GetIt.I.get<MediaDao>();
+    return BroadcastStep(mediaDao);
+  });
   GetIt.I.registerLazySingleton<PostMediaContext>(() {
     var jarDao = GetIt.I.get<JarDao>();
     return PostMediaContext(_postMediaJarId, jarDao);
   });
   GetIt.I.registerLazySingleton<PostMediaJob>(() {
     var database = GetIt.I.get<Database>();
-    var originAssetStep = GetIt.I.get<OriginAssetStep>();
     var smThumbAssetStep = GetIt.I.get<ThumbAssetStep>(
       instanceName: 'smThumbAssetStep',
     );
@@ -130,6 +139,8 @@ initDependencies() {
     var lgThumbAssetStep = GetIt.I.get<ThumbAssetStep>(
       instanceName: 'lgThumbAssetStep',
     );
+    var originAssetStep = GetIt.I.get<OriginAssetStep>();
+    var broadcastStep = GetIt.I.get<BroadcastStep>();
 
     var context = GetIt.I.get<PostMediaContext>();
     return PostMediaJob(database, context, [
@@ -137,6 +148,7 @@ initDependencies() {
       mdThumbAssetStep,
       lgThumbAssetStep,
       originAssetStep,
+      broadcastStep
     ]);
   });
 }

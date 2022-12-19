@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:uuid/uuid.dart';
 
@@ -13,6 +14,9 @@ import 'asset_step_result.dart';
 import 'post_media_context.dart';
 
 abstract class AssetStep extends Step<PostMediaContext> {
+  @protected
+  final log = Logger('AssetStep');
+
   @protected
   final Database database;
 
@@ -44,32 +48,47 @@ abstract class AssetStep extends Step<PostMediaContext> {
     if (uuid == null) {
       uuid = getUuid();
       await result.setUuid(uuid);
+      log.info('UUID not found in context. Generated new, uuid=$uuid');
+    } else {
+      log.info('UUID found in context, uuid=$uuid');
     }
 
     final assetFile = await getAsset(context);
 
     final secretKey = getSecretKey();
     await result.setSecretKey(secretKey);
+    log.info('Generated secret key');
 
     final fileSize = await getFileSize(assetFile);
     await result.setFileSize(fileSize);
+    log.info('Generated file size, fileSize=$fileSize');
 
     final fileType = getFileType(assetFile);
     await result.setFileType(fileType);
+    log.info('Generated file type, fileType=$fileType');
 
     final checksum = await getChecksum(assetFile);
     await result.setChecksum(checksum);
+    log.info('Generated checksum, chekcsum=$checksum');
 
     final assetFileEnc = await getTmpFile(uuid, 'enc');
 
     final secretHeader = await encrypt(assetFile, assetFileEnc, secretKey);
     await result.setSecretHeader(secretHeader);
+    log.info(
+      'Encrypted output file, '
+      'input=${assetFile.path} output=${assetFileEnc.path}',
+    );
+    log.info('Generated secret header');
 
     await uploadFile(uuid, assetFileEnc);
 
     await assetFileEnc.delete();
+    log.info('Deleted encrypted output file, path=${assetFileEnc.path}');
+
     if (!shouldKeepAsset()) {
       await assetFile.delete();
+      log.info('Deleted input file, path=${assetFile.path}');
     }
   }
 
@@ -90,7 +109,7 @@ abstract class AssetStep extends Step<PostMediaContext> {
   bool shouldKeepAsset();
 
   @protected
-  Future<File> getTmpFile(String name, String extension) async {
+  Future<File> getTmpFile(String name, String extension) {
     return tmpDir.getFile(name, extension);
   }
 

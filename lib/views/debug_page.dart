@@ -6,6 +6,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photos/services/local_media_replicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../jobs/post_media/post_media_job.dart';
 import '../models/media.dart';
 import '../services/database.dart';
 
@@ -42,6 +43,11 @@ class _DebugPageState extends State<DebugPage> {
   Future synchronize() async {
     var localMediaStore = await GetIt.I.getAsync<LocalMediaReplicator>();
     await localMediaStore.replicate();
+  }
+
+  Future backup() async {
+    var postMediaJob = GetIt.I.get<PostMediaJob>();
+    await postMediaJob.execute();
   }
 
   Future<List<_Property>> loadCfgProps() async {
@@ -132,6 +138,9 @@ class _DebugPageState extends State<DebugPage> {
                   await synchronize();
                   refresh();
                 }
+                if (item == _Menu.backup) {
+                  await backup();
+                }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<_Menu>>[
                 const PopupMenuItem<_Menu>(
@@ -149,6 +158,10 @@ class _DebugPageState extends State<DebugPage> {
                 const PopupMenuItem<_Menu>(
                   value: _Menu.synchronize,
                   child: Text('Synchronize'),
+                ),
+                const PopupMenuItem<_Menu>(
+                  value: _Menu.backup,
+                  child: Text('Backup'),
                 ),
               ],
             ),
@@ -195,4 +208,5 @@ enum _Menu {
   resetConfiguration,
   resetCache,
   synchronize,
+  backup,
 }
