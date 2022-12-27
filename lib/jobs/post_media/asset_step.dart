@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
+import 'package:photos/services/s3fs.dart';
+import 'package:photos/utils/s3/secret.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../services/database.dart';
@@ -32,12 +34,16 @@ abstract class AssetStep extends Step<PostMediaContext> {
   @protected
   final TmpDir tmpDir;
 
+  @protected
+  final S3Fs s3fs;
+
   AssetStep(
     this.database,
     this.secretBox,
     this.uuid,
     this.checksum,
     this.tmpDir,
+    this.s3fs,
   );
 
   @override
@@ -48,48 +54,69 @@ abstract class AssetStep extends Step<PostMediaContext> {
     if (uuid == null) {
       uuid = getUuid();
       await result.setUuid(uuid);
-      log.info('UUID not found in context. Generated new, uuid=$uuid');
+      log.info('Generated UUID, uuid=$uuid');
     } else {
-      log.info('UUID found in context, uuid=$uuid');
+      log.info('UUID found in the step result, uuid=$uuid');
     }
 
     final assetFile = await getAsset(context);
 
-    final secretKey = getSecretKey();
-    await result.setSecretKey(secretKey);
-    log.info('Generated secret key');
+    var fileSizeFuture = fileSizeAsync(result, assetFile);
+    var fileTypeFuture = fileTypeAsync(result, assetFile);
+    var checksumFuture = checksumAsync(result, assetFile);
+    var uploadFuture = uploadAsync(result, uuid, assetFile);
 
-    final fileSize = await getFileSize(assetFile);
-    await result.setFileSize(fileSize);
-    log.info('Generated file size, fileSize=$fileSize');
-
-    final fileType = getFileType(assetFile);
-    await result.setFileType(fileType);
-    log.info('Generated file type, fileType=$fileType');
-
-    final checksum = await getChecksum(assetFile);
-    await result.setChecksum(checksum);
-    log.info('Generated checksum, chekcsum=$checksum');
-
-    final assetFileEnc = await getTmpFile(uuid, 'enc');
-
-    final secretHeader = await encrypt(assetFile, assetFileEnc, secretKey);
-    await result.setSecretHeader(secretHeader);
-    log.info(
-      'Encrypted output file, '
-      'input=${assetFile.path} output=${assetFileEnc.path}',
-    );
-    log.info('Generated secret header');
-
-    await uploadFile(uuid, assetFileEnc);
-
-    await assetFileEnc.delete();
-    log.info('Deleted encrypted output file, path=${assetFileEnc.path}');
+    await Future.wait([
+      fileSizeFuture,
+      fileTypeFuture,
+      checksumFuture,
+      uploadFuture,
+    ]);
 
     if (!shouldKeepAsset()) {
       await assetFile.delete();
       log.info('Deleted input file, path=${assetFile.path}');
     }
+  }
+
+  Future fileTypeAsync(
+    AssetStepResult result,
+    File assetFile,
+  ) async {
+    final fileType = getFileType(assetFile);
+    await result.setFileType(fileType);
+    log.info('Generated file type, fileType=$fileType');
+  }
+
+  Future fileSizeAsync(
+    AssetStepResult result,
+    File assetFile,
+  ) async {
+    final fileSize = await getFileSize(assetFile);
+    await result.setFileSize(fileSize);
+    log.info('Generated file size, fileSize=$fileSize');
+  }
+
+  Future checksumAsync(
+    AssetStepResult result,
+    File assetFile,
+  ) async {
+    final checksum = await getChecksum(assetFile);
+    await result.setChecksum(checksum);
+    log.info('Generated checksum, chekcsum=$checksum');
+  }
+
+  Future uploadAsync(
+    AssetStepResult result,
+    String uuid,
+    File assetFile,
+  ) async {
+    final secret = await upload(uuid, assetFile);
+    log.info('Uploaded file');
+
+    await result.setSecretKey(secret.key);
+    await result.setSecretHeader(secret.header);
+    log.info('Generated secret key and header');
   }
 
   @override
@@ -139,16 +166,7 @@ abstract class AssetStep extends Step<PostMediaContext> {
   }
 
   @protected
-  Future<Uint8List> encrypt(File src, File dst, Uint8List secretKey) async {
-    return secretBox.encrypt(src, dst, secretKey);
-  }
-
-  @protected
-  Future uploadFile(
-    String uuid,
-    File src,
-  ) async {
-    // generate upload link
-    // stream and encrypt
+  Future<Secret> upload(String uuid, File src) {
+    return s3fs.put('/medias/$uuid', src);
   }
 }

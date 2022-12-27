@@ -29,6 +29,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.9.0"
+  aws_common:
+    dependency: "direct main"
+    description:
+      name: aws_common
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.5"
+  aws_signature_v4:
+    dependency: "direct main"
+    description:
+      name: aws_signature_v4
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -270,6 +284,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  http2:
+    dependency: transitive
+    description:
+      name: http2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   http_multi_server:
     dependency: transitive
     description:
@@ -382,6 +403,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  os_detect:
+    dependency: transitive
+    description:
+      name: os_detect
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   package_config:
     dependency: transitive
     description:

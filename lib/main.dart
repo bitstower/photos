@@ -21,7 +21,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (kDebugMode) {
-    Logger.root.level = Level.FINE;
+    Logger.root.level = Level.FINEST;
   }
   if (kReleaseMode) {
     Logger.root.level = Level.WARNING;

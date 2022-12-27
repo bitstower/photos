@@ -16,6 +16,7 @@ class OriginAssetStep extends AssetStep {
     super.uuid,
     super.checksum,
     super.tmpDir,
+    super.s3fs,
   );
 
   @override

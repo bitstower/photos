@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:aws_common/aws_common.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:aws_signature_v4/aws_signature_v4.dart';
 
 class NetworkStorage {
   final String endpoint;
@@ -26,6 +30,55 @@ class NetworkStorage {
     return 'https://$endpoint/$bucketName$filePath'
         '?AWSAccessKeyId=$accessKey&Signature=$signature&Expires=$expires';
   }
+
+  Future upload(String name, File file) async {
+    const region = 'us-east-1';
+    const host = 'gateway.storjshare.io';
+
+    const signer = AWSSigV4Signer();
+
+    final scope = AWSCredentialScope(
+      region: region,
+      service: AWSService.s3,
+    );
+
+    final serviceConfiguration = S3ServiceConfiguration();
+
+    final stream = file.openRead();
+    final path = '/$bucketName/$name';
+    print('==>' + Uri.https(host, path).toString());
+    final uploadRequest = AWSStreamedHttpRequest.put(
+      Uri.https(host, path),
+      body: stream,
+      headers: {
+        AWSHeaders.host: host,
+        AWSHeaders.contentType: 'text/plain',
+      },
+    );
+
+    print('Uploading file to $path...');
+    final signedUploadRequest = await signer.sign(
+      uploadRequest,
+      credentialScope: scope,
+      serviceConfiguration: serviceConfiguration,
+    );
+    try {
+      final uploadResponse =
+          await signedUploadRequest.send(client: MyHttpClient()).response;
+      final body = await uploadResponse.decodeBody();
+      final uploadStatus = uploadResponse.statusCode;
+      print('Upload File Response: $uploadStatus body=$body');
+    } catch (e) {
+      print('==>');
+      print(e.toString());
+    }
+  }
+}
+
+class MyHttpClient extends AWSCustomHttpClient {
+  MyHttpClient() {
+    supportedProtocols = SupportedProtocols.http1;
+  }
 }
 
 class StorjStorage extends NetworkStorage {
@@ -35,8 +88,8 @@ class StorjStorage extends NetworkStorage {
 
 NetworkStorage buildNetworkStorage() {
   const bucketName = String.fromEnvironment("S3_BUCKET_NAME");
-  const accessKey = String.fromEnvironment("S3_ACCESS_KEY");
-  const secretKey = String.fromEnvironment("S3_SECRET_KEY");
+  const accessKey = String.fromEnvironment("AWS_ACCESS_KEY_ID");
+  const secretKey = String.fromEnvironment("AWS_SECRET_ACCESS_KEY");
 
   assert(bucketName.isNotEmpty);
   assert(accessKey.isNotEmpty);

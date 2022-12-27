@@ -12,7 +12,11 @@ class SecretBox {
     return Sodium.cryptoSecretstreamXchacha20poly1305Keygen();
   }
 
-  Future<Uint8List> encrypt(File src, File dst, Uint8List key) async {
+  Future<Uint8List> encrypt(
+    File src,
+    File dst,
+    Uint8List key,
+  ) async {
     final sourceFile = src;
     final destinationFile = dst;
 

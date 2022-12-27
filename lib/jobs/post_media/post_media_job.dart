@@ -6,6 +6,7 @@ import '../job.dart';
 import '../step.dart';
 import '../../models/media.dart';
 import '../../services/database.dart';
+import '../../services/s3fs.dart' as s3fs;
 import 'post_media_context.dart';
 
 @sealed
@@ -41,15 +42,18 @@ class PostMediaJob extends Job<PostMediaContext> {
       mediaId = await _getNextMediaId();
     }
 
-    _log.info('PostMediaJob completed');
+    _log.info('PostMediaJob completed, totalMs=${s3fs.total}');
   }
 
   Future _processMedia(int mediaId, int stepIdx) async {
     await context.setMediaId(mediaId);
+    List<Future> futures = [];
     for (var i = stepIdx; i < _steps.length; i++) {
-      await context.setStepIdx(i);
-      await _steps[i].execute(context);
+      // await context.setStepIdx(i);
+      // await _steps[i].execute(context);
+      futures.add(_steps[i].execute(context));
     }
+    await Future.wait(futures);
     await context.reset();
   }
 

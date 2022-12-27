@@ -15,6 +15,8 @@ class BroadcastStep extends Step<PostMediaContext> {
     final mediaId = context.getMediaId();
     assert(mediaId != null);
 
+    // TODO update asset objects
+
     final media = await _mediaDao.getById(mediaId!);
     assert(media != null);
 

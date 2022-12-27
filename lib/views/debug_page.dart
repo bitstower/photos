@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photos/services/local_media_replicator.dart';
+import 'package:photos/services/network_storage.dart';
+import 'package:photos/utils/tmp_dir.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../jobs/post_media/post_media_job.dart';
@@ -48,6 +50,14 @@ class _DebugPageState extends State<DebugPage> {
   Future backup() async {
     var postMediaJob = GetIt.I.get<PostMediaJob>();
     await postMediaJob.execute();
+  }
+
+  Future uploadTest() async {
+    var ns = buildNetworkStorage();
+    var tmpDir = const TmpDir();
+    var file = await tmpDir.getFile('test', 'txt');
+    file.writeAsStringSync("Lorem ipsum", flush: true);
+    await ns.upload('test2.txt', file);
   }
 
   Future<List<_Property>> loadCfgProps() async {
@@ -141,6 +151,9 @@ class _DebugPageState extends State<DebugPage> {
                 if (item == _Menu.backup) {
                   await backup();
                 }
+                if (item == _Menu.uploadTest) {
+                  await uploadTest();
+                }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<_Menu>>[
                 const PopupMenuItem<_Menu>(
@@ -162,6 +175,10 @@ class _DebugPageState extends State<DebugPage> {
                 const PopupMenuItem<_Menu>(
                   value: _Menu.backup,
                   child: Text('Backup'),
+                ),
+                const PopupMenuItem<_Menu>(
+                  value: _Menu.uploadTest,
+                  child: Text('Upload test'),
                 ),
               ],
             ),
@@ -209,4 +226,5 @@ enum _Menu {
   resetCache,
   synchronize,
   backup,
+  uploadTest,
 }

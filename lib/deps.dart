@@ -1,7 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:photos/jobs/post_media/broadcast_step.dart';
 import 'package:photos/jobs/post_media/post_media_job.dart';
+import 'package:photos/services/account.dart';
 import 'package:photos/services/media_dao.dart';
+import 'package:photos/services/s3fs.dart';
+import 'package:photos/utils/s3/s3_factory.dart';
+import 'package:photos/utils/s3/storj_factory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -48,6 +52,20 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return MediaController(database);
   });
+  GetIt.I.registerLazySingleton<Account>(() {
+    return Account();
+  });
+  GetIt.I.registerLazySingleton<S3Factory>(() {
+    var account = GetIt.I.get<Account>();
+    return StorjFactory(account);
+  });
+  GetIt.I.registerLazySingleton<S3Fs>(() {
+    var s3Factory = GetIt.I.get<S3Factory>();
+    var secretBox = GetIt.I.get<SecretBox>();
+    var tmpDir = GetIt.I.get<TmpDir>();
+    var uuid = GetIt.I.get<Uuid>();
+    return S3Fs(s3Factory, secretBox, tmpDir, uuid);
+  });
   GetIt.I.registerLazySingleton<ThumbAssetStep>(
     () {
       var database = GetIt.I.get<Database>();
@@ -55,6 +73,7 @@ initDependencies() {
       var uuid = GetIt.I.get<Uuid>();
       var checksum = GetIt.I.get<Checksum>();
       var tmpDir = GetIt.I.get<TmpDir>();
+      var s3Fs = GetIt.I.get<S3Fs>();
 
       return ThumbAssetStep(
         ImageResolution.sd,
@@ -63,6 +82,7 @@ initDependencies() {
         uuid,
         checksum,
         tmpDir,
+        s3Fs,
       );
     },
     instanceName: 'smThumbAssetStep',
@@ -74,6 +94,7 @@ initDependencies() {
       var uuid = GetIt.I.get<Uuid>();
       var checksum = GetIt.I.get<Checksum>();
       var tmpDir = GetIt.I.get<TmpDir>();
+      var s3Fs = GetIt.I.get<S3Fs>();
 
       return ThumbAssetStep(
         ImageResolution.hd,
@@ -82,6 +103,7 @@ initDependencies() {
         uuid,
         checksum,
         tmpDir,
+        s3Fs,
       );
     },
     instanceName: 'mdThumbAssetStep',
@@ -93,6 +115,7 @@ initDependencies() {
       var uuid = GetIt.I.get<Uuid>();
       var checksum = GetIt.I.get<Checksum>();
       var tmpDir = GetIt.I.get<TmpDir>();
+      var s3Fs = GetIt.I.get<S3Fs>();
 
       return ThumbAssetStep(
         ImageResolution.qhd,
@@ -101,6 +124,7 @@ initDependencies() {
         uuid,
         checksum,
         tmpDir,
+        s3Fs,
       );
     },
     instanceName: 'lgThumbAssetStep',
@@ -111,6 +135,7 @@ initDependencies() {
     var uuid = GetIt.I.get<Uuid>();
     var checksum = GetIt.I.get<Checksum>();
     var tmpDir = GetIt.I.get<TmpDir>();
+    var s3Fs = GetIt.I.get<S3Fs>();
 
     return OriginAssetStep(
       database,
@@ -118,6 +143,7 @@ initDependencies() {
       uuid,
       checksum,
       tmpDir,
+      s3Fs,
     );
   });
   GetIt.I.registerLazySingleton<BroadcastStep>(() {
