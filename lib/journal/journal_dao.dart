@@ -1,13 +1,15 @@
 import 'package:meta/meta.dart';
 import 'package:photos/journal/journal_repository.dart';
+import 'package:photos/journal/record_serializer.dart';
 
 import 'record.dart';
 
 @sealed
 class JournalDao {
   final JournalRepository _repository;
+  final RecordSerializer _serializer;
 
-  JournalDao(this._repository);
+  JournalDao(this._repository, this._serializer);
 
   Future<List<Record>> getUnreadRecords() async {
     final records = <Record>[];
@@ -16,7 +18,7 @@ class JournalDao {
     for (var journal in journals) {
       var objects = await journal.read();
       for (var object in objects) {
-        records.add(Record.fromMap(object));
+        records.add(_serializer.fromJson(object));
       }
     }
 
@@ -25,6 +27,6 @@ class JournalDao {
 
   Future addRecord(Record record) async {
     final journal = await _repository.getOwnJournal();
-    journal.append([record.asMap()]);
+    await journal.append(_serializer.toJson(record));
   }
 }

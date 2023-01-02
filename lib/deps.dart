@@ -6,6 +6,7 @@ import 'package:photos/journal/journal.dart';
 import 'package:photos/journal/journal_context.dart';
 import 'package:photos/journal/journal_dao.dart';
 import 'package:photos/journal/journal_repository.dart';
+import 'package:photos/journal/record_serializer.dart';
 import 'package:photos/services/account.dart';
 import 'package:photos/services/media_dao.dart';
 import 'package:photos/services/s3fs.dart';
@@ -56,9 +57,21 @@ initDependencies() {
     var context = GetIt.I.get<JournalContext>();
     return JournalRepository(context, account, s3fs);
   });
+  GetIt.I.registerLazySingleton<AssetSerializer>(() {
+    return AssetSerializer();
+  });
+  GetIt.I.registerLazySingleton<PostMediaSerializer>(() {
+    var assetSerializer = GetIt.I.get<AssetSerializer>();
+    return PostMediaSerializer(assetSerializer);
+  });
+  GetIt.I.registerLazySingleton<RecordSerializer>(() {
+    var postMediaSerializer = GetIt.I.get<PostMediaSerializer>();
+    return RecordSerializer(postMediaSerializer);
+  });
   GetIt.I.registerLazySingleton<JournalDao>(() {
-    var repo = GetIt.I.get<JournalRepository>();
-    return JournalDao(repo);
+    var repository = GetIt.I.get<JournalRepository>();
+    var serializer = GetIt.I.get<RecordSerializer>();
+    return JournalDao(repository, serializer);
   });
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
     return await SharedPreferences.getInstance();

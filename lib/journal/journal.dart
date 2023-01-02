@@ -22,23 +22,17 @@ class Journal {
 
   Journal(this.file, this.offset);
 
-  Future append(List<dynamic> records) async {
+  Future append(dynamic record) async {
     var writer = await file.open(mode: FileMode.append);
 
-    // go to the end and append events
-    for (var record in records) {
-      await _writeEvent(writer, record);
-    }
+    await _writeEvent(writer, record);
 
     await writer.flush();
     await writer.close();
 
     var fileSize = await file.length(); // bytes
 
-    _log.fine(
-      'Appended ${records.length} records, '
-      'file=${file.path} fileSize=$fileSize',
-    );
+    _log.fine('Appended a record, file=${file.path} fileSize=$fileSize');
   }
 
   Future<List<dynamic>> read() async {
@@ -80,5 +74,23 @@ class Journal {
     var event = deserialize(eventAsBytes);
 
     return event;
+  }
+}
+
+class ReadJournal extends Journal {
+  ReadJournal(super.file, super.offset);
+
+  @override
+  Future<int> append(dynamic record) {
+    throw UnimplementedError();
+  }
+}
+
+class WriteJournal extends Journal {
+  WriteJournal(super.file, super.offset);
+
+  @override
+  Future<List<dynamic>> read() {
+    throw UnimplementedError();
   }
 }

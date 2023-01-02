@@ -1,8 +1,7 @@
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:photos/journal/journal_context.dart';
-import 'package:photos/journal/journal_tracker.dart';
-import 'package:photos/journal/read_journal.dart';
-import 'package:photos/journal/write_journal.dart';
 
 import '../services/account.dart';
 import '../services/s3fs.dart';
@@ -27,11 +26,11 @@ class JournalRepository {
 
     for (var remoteInfo in remoteInfos) {
       var tracker = JournalTracker(
-        remoteInfo.deviceUuid,
-        _context.getReadOffset(remoteInfo.deviceUuid),
-        remoteFileSize: remoteInfo.fileSize,
+        uuid: remoteInfo.deviceUuid,
+        readOffset: _context.getReadOffset(remoteInfo.deviceUuid),
         own: remoteInfo.deviceUuid == thisDeviceUuid,
         directory: directory,
+        remoteFileSize: remoteInfo.fileSize,
       );
       if (!hasOwn) {
         hasOwn = tracker.own;
@@ -41,8 +40,8 @@ class JournalRepository {
 
     if (!hasOwn) {
       trackers.add(JournalTracker(
-        thisDeviceUuid,
-        _context.getReadOffset(thisDeviceUuid),
+        uuid: thisDeviceUuid,
+        readOffset: _context.getReadOffset(thisDeviceUuid),
         own: true,
         directory: directory,
       ));
@@ -61,7 +60,7 @@ class JournalRepository {
     final unread = <ReadJournal>[];
 
     for (var tracker in trackers) {
-      if (tracker.unread) {
+      if (tracker.cached && tracker.unread) {
         unread.add(ReadJournal(tracker.file, tracker.readOffset));
         await _context.setReadOffset(
           tracker.uuid,
@@ -94,4 +93,28 @@ class JournalRepository {
       }
     }
   }
+}
+
+class JournalTracker {
+  final String uuid;
+
+  final int remoteFileSize;
+  final int readOffset;
+  final bool own;
+
+  final Directory directory;
+
+  JournalTracker({
+    required this.uuid,
+    required this.readOffset,
+    required this.own,
+    required this.directory,
+    this.remoteFileSize = 0,
+  });
+
+  bool get outdated => remoteFileSize != file.lengthSync();
+  bool get cached => file.existsSync();
+  bool get unread => readOffset < file.lengthSync();
+  File get file => File('${directory.path}/$uuid');
+  String get uri => '/journal/$uuid';
 }

@@ -1,29 +1,79 @@
-import 'record_type.dart';
+import 'package:flutter/foundation.dart';
 
 class Record {
-  final _type = 0;
-  final _timestamp = 1;
-  final _schema = 2;
+  final RecordType type;
+  final dynamic payload;
 
-  final Map<int, dynamic> properties;
+  final int timestamp;
+  final int schema;
 
-  Record({required RecordType type}) : properties = {} {
-    properties[_type] = type.idx;
-    properties[_timestamp] = DateTime.now().millisecondsSinceEpoch;
-    properties[_schema] = 1;
+  Record({
+    required this.type,
+    required this.payload,
+    int? timestamp,
+    int? schema,
+  })  : timestamp = timestamp ?? DateTime.now().millisecondsSinceEpoch,
+        schema = schema ?? 1;
+}
+
+enum RecordType {
+  postMedia(0);
+
+  final int idx;
+
+  const RecordType(this.idx);
+
+  static RecordType fromNum(int idx) {
+    switch (idx) {
+      case 0:
+        return postMedia;
+      default:
+        throw Exception('Unknown value');
+    }
   }
+}
 
-  Record.fromMap(this.properties) {
-    assert(properties[_type] != null);
-    assert(properties[_schema] != null);
-    assert(properties[_timestamp] != null);
-  }
+class PostMedia {
+  final int type;
+  final int taken;
+  final int orientatedWidth;
+  final int orientatedHeight;
+  final int orientation;
+  final int duration;
 
-  Map<int, dynamic> asMap() {
-    return Map.unmodifiable(properties);
-  }
+  final Asset smThumbAsset;
+  final Asset mdThumbAsset;
+  final Asset lgThumbAsset;
+  final Asset originAsset;
 
-  RecordType getType() => RecordType.fromNum(properties[_type]);
-  int getTimestamp() => properties[_timestamp];
-  int getSchema() => properties[_schema];
+  PostMedia({
+    required this.type,
+    required this.taken,
+    required this.orientatedWidth,
+    required this.orientatedHeight,
+    required this.orientation,
+    required this.duration,
+    required this.smThumbAsset,
+    required this.mdThumbAsset,
+    required this.lgThumbAsset,
+    required this.originAsset,
+  });
+}
+
+class Asset {
+  final String uuid;
+  final Uint8List secretKey;
+  final Uint8List secretHeader;
+  final String checksum;
+  final int fileSize;
+  final String fileType;
+
+  Asset({
+    required this.uuid,
+    required this.secretKey,
+    required this.secretHeader,
+    required this.checksum,
+    required this.fileSize,
+    required this.fileType,
+  });
 }
