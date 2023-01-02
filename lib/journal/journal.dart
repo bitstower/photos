@@ -16,23 +16,18 @@ import '../utils/bytes.dart';
 ///
 class Journal {
   final File file;
+  final int offset;
 
   final _log = Logger('Journal');
 
-  Journal(this.file);
+  Journal(this.file, this.offset);
 
-  Future<int> append(List<dynamic> events) async {
-    var writer = await file.open(mode: FileMode.write);
-
-    // go to the start and update event count
-    await writer.setPosition(0);
-    var countAsBytes = await writer.read(kUint32Size);
-    await writer.writeFrom(incrementUint32(countAsBytes, events.length));
+  Future append(List<dynamic> records) async {
+    var writer = await file.open(mode: FileMode.append);
 
     // go to the end and append events
-    await writer.setPosition(await writer.length());
-    for (var event in events) {
-      await _writeEvent(writer, event);
+    for (var record in records) {
+      await _writeEvent(writer, record);
     }
 
     await writer.flush();
@@ -41,30 +36,12 @@ class Journal {
     var fileSize = await file.length(); // bytes
 
     _log.fine(
-      'Appended ${events.length} events, '
+      'Appended ${records.length} records, '
       'file=${file.path} fileSize=$fileSize',
     );
-
-    return fileSize;
   }
 
-  Future<int> count() async {
-    var reader = await file.open(mode: FileMode.read);
-
-    // go to the start and read event count
-    await reader.setPosition(0);
-    var countAsBytes = await reader.read(kUint32Size);
-
-    await reader.close();
-
-    return fromUint32(countAsBytes);
-  }
-
-  Future<List<dynamic>> readAll() async {
-    return read(kUint32Size); // skip event count at the start
-  }
-
-  Future<List<dynamic>> read(int offset) async {
+  Future<List<dynamic>> read() async {
     var fileSize = await file.length();
     if (fileSize == 0) {
       return [];

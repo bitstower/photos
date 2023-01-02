@@ -1,6 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:photos/jobs/post_media/broadcast_step.dart';
+import 'package:photos/jobs/post_media/journal_step.dart';
 import 'package:photos/jobs/post_media/post_media_job.dart';
+import 'package:photos/journal/journal.dart';
+import 'package:photos/journal/journal_context.dart';
+import 'package:photos/journal/journal_dao.dart';
+import 'package:photos/journal/journal_repository.dart';
 import 'package:photos/services/account.dart';
 import 'package:photos/services/media_dao.dart';
 import 'package:photos/services/s3fs.dart';
@@ -23,6 +28,8 @@ import 'utils/image_resolution.dart';
 import 'utils/tmp_dir.dart';
 
 const int _postMediaJarId = 0;
+const int _accountJarId = 1;
+const int _journalJarId = 2;
 
 initDependencies() {
   GetIt.I.registerLazySingleton<Database>(() => Database());
@@ -39,6 +46,20 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return MediaDao(database);
   });
+  GetIt.I.registerLazySingleton<JournalContext>(() {
+    var jarDao = GetIt.I.get<JarDao>();
+    return JournalContext(_journalJarId, jarDao);
+  });
+  GetIt.I.registerLazySingleton<JournalRepository>(() {
+    var account = GetIt.I.get<Account>();
+    var s3fs = GetIt.I.get<S3Fs>();
+    var context = GetIt.I.get<JournalContext>();
+    return JournalRepository(context, account, s3fs);
+  });
+  GetIt.I.registerLazySingleton<JournalDao>(() {
+    var repo = GetIt.I.get<JournalRepository>();
+    return JournalDao(repo);
+  });
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
     return await SharedPreferences.getInstance();
   });
@@ -52,8 +73,14 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return MediaController(database);
   });
+  GetIt.I.registerLazySingleton<AccountContext>(() {
+    var jarDao = GetIt.I.get<JarDao>();
+    return AccountContext(_accountJarId, jarDao);
+  });
   GetIt.I.registerLazySingleton<Account>(() {
-    return Account();
+    var context = GetIt.I.get<AccountContext>();
+    var uuid = GetIt.I.get<Uuid>();
+    return Account(uuid, context);
   });
   GetIt.I.registerLazySingleton<S3Factory>(() {
     var account = GetIt.I.get<Account>();
@@ -146,6 +173,11 @@ initDependencies() {
       s3Fs,
     );
   });
+  GetIt.I.registerLazySingleton<JournalStep>(() {
+    var mediaDao = GetIt.I.get<MediaDao>();
+    var journalDao = GetIt.I.get<JournalDao>();
+    return JournalStep(journalDao, mediaDao);
+  });
   GetIt.I.registerLazySingleton<BroadcastStep>(() {
     var mediaDao = GetIt.I.get<MediaDao>();
     return BroadcastStep(mediaDao);
@@ -156,6 +188,7 @@ initDependencies() {
   });
   GetIt.I.registerLazySingleton<PostMediaJob>(() {
     var database = GetIt.I.get<Database>();
+    var journalRepo = GetIt.I.get<JournalRepository>();
     var smThumbAssetStep = GetIt.I.get<ThumbAssetStep>(
       instanceName: 'smThumbAssetStep',
     );
@@ -166,15 +199,20 @@ initDependencies() {
       instanceName: 'lgThumbAssetStep',
     );
     var originAssetStep = GetIt.I.get<OriginAssetStep>();
+    var journalStep = GetIt.I.get<JournalStep>();
     var broadcastStep = GetIt.I.get<BroadcastStep>();
 
     var context = GetIt.I.get<PostMediaContext>();
-    return PostMediaJob(database, context, [
+    return PostMediaJob(
+      database,
+      context,
+      journalRepo,
       smThumbAssetStep,
       mdThumbAssetStep,
       lgThumbAssetStep,
       originAssetStep,
-      broadcastStep
-    ]);
+      journalStep,
+      broadcastStep,
+    );
   });
 }

@@ -33,6 +33,10 @@ class Media {
   late short duration; // seconds
 
   LocalAsset? localOrigin;
+
+  RemoteAsset? remoteSmThumb;
+  RemoteAsset? remoteMdThumb;
+  RemoteAsset? remoteLgThumb;
   RemoteAsset? remoteOrigin;
 
   // checksum

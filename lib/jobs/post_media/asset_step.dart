@@ -61,10 +61,10 @@ abstract class AssetStep extends Step<PostMediaContext> {
 
     final assetFile = await getAsset(context);
 
-    var fileSizeFuture = fileSizeAsync(result, assetFile);
-    var fileTypeFuture = fileTypeAsync(result, assetFile);
-    var checksumFuture = checksumAsync(result, assetFile);
-    var uploadFuture = uploadAsync(result, uuid, assetFile);
+    var fileSizeFuture = fileSizeUnit(result, assetFile);
+    var fileTypeFuture = fileTypeUnit(result, assetFile);
+    var checksumFuture = checksumUnit(result, assetFile);
+    var uploadFuture = uploadUnit(result, uuid, assetFile);
 
     await Future.wait([
       fileSizeFuture,
@@ -79,7 +79,8 @@ abstract class AssetStep extends Step<PostMediaContext> {
     }
   }
 
-  Future fileTypeAsync(
+  @protected
+  Future fileTypeUnit(
     AssetStepResult result,
     File assetFile,
   ) async {
@@ -88,7 +89,8 @@ abstract class AssetStep extends Step<PostMediaContext> {
     log.info('Generated file type, fileType=$fileType');
   }
 
-  Future fileSizeAsync(
+  @protected
+  Future fileSizeUnit(
     AssetStepResult result,
     File assetFile,
   ) async {
@@ -97,7 +99,8 @@ abstract class AssetStep extends Step<PostMediaContext> {
     log.info('Generated file size, fileSize=$fileSize');
   }
 
-  Future checksumAsync(
+  @protected
+  Future checksumUnit(
     AssetStepResult result,
     File assetFile,
   ) async {
@@ -106,7 +109,8 @@ abstract class AssetStep extends Step<PostMediaContext> {
     log.info('Generated checksum, chekcsum=$checksum');
   }
 
-  Future uploadAsync(
+  @protected
+  Future uploadUnit(
     AssetStepResult result,
     String uuid,
     File assetFile,
