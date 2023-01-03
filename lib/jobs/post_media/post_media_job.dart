@@ -47,7 +47,7 @@ class PostMediaJob extends Job<PostMediaContext> {
 
     int? mediaId;
 
-    mediaId = context.getMediaId();
+    mediaId = context.data.mediaId;
     if (mediaId != null) {
       _log.info('Media found in context, mediaId=$mediaId');
       await _processMedia(mediaId);
@@ -65,7 +65,8 @@ class PostMediaJob extends Job<PostMediaContext> {
   }
 
   Future _processMedia(int mediaId) async {
-    await context.setMediaId(mediaId);
+    context.data.mediaId = mediaId;
+    await context.persist();
 
     List<Future> futures1 = [];
     futures1.add(_smThumbAssetStep.execute(context));

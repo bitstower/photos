@@ -1,15 +1,16 @@
 import 'package:get_it/get_it.dart';
+import 'package:photos/jobs/post_media/asset_step_result.dart';
 import 'package:photos/jobs/post_media/broadcast_step.dart';
 import 'package:photos/jobs/post_media/journal_step.dart';
 import 'package:photos/jobs/post_media/post_media_job.dart';
-import 'package:photos/journal/journal.dart';
 import 'package:photos/journal/journal_context.dart';
 import 'package:photos/journal/journal_dao.dart';
 import 'package:photos/journal/journal_repository.dart';
-import 'package:photos/journal/record_serializer.dart';
+import 'package:photos/journal/record_serializer.dart' as journal;
 import 'package:photos/services/account.dart';
 import 'package:photos/services/media_dao.dart';
 import 'package:photos/services/s3fs.dart';
+import 'package:photos/utils/context.dart';
 import 'package:photos/utils/s3/s3_factory.dart';
 import 'package:photos/utils/s3/storj_factory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,30 +48,34 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return MediaDao(database);
   });
-  GetIt.I.registerLazySingleton<JournalContext>(() {
+  GetIt.I.registerLazySingleton<JournalContextSerializer>(() {
+    return JournalContextSerializer();
+  });
+  GetIt.I.registerLazySingleton<Context<JournalContext>>(() {
     var jarDao = GetIt.I.get<JarDao>();
-    return JournalContext(_journalJarId, jarDao);
+    var serializer = GetIt.I.get<JournalContextSerializer>();
+    return Context<JournalContext>(_journalJarId, jarDao, serializer);
   });
   GetIt.I.registerLazySingleton<JournalRepository>(() {
     var account = GetIt.I.get<Account>();
     var s3fs = GetIt.I.get<S3Fs>();
-    var context = GetIt.I.get<JournalContext>();
+    var context = GetIt.I.get<Context<JournalContext>>();
     return JournalRepository(context, account, s3fs);
   });
-  GetIt.I.registerLazySingleton<AssetSerializer>(() {
-    return AssetSerializer();
+  GetIt.I.registerLazySingleton<journal.AssetSerializer>(() {
+    return journal.AssetSerializer();
   });
-  GetIt.I.registerLazySingleton<PostMediaSerializer>(() {
-    var assetSerializer = GetIt.I.get<AssetSerializer>();
-    return PostMediaSerializer(assetSerializer);
+  GetIt.I.registerLazySingleton<journal.PostMediaSerializer>(() {
+    var assetSerializer = GetIt.I.get<journal.AssetSerializer>();
+    return journal.PostMediaSerializer(assetSerializer);
   });
-  GetIt.I.registerLazySingleton<RecordSerializer>(() {
-    var postMediaSerializer = GetIt.I.get<PostMediaSerializer>();
-    return RecordSerializer(postMediaSerializer);
+  GetIt.I.registerLazySingleton<journal.RecordSerializer>(() {
+    var postMediaSerializer = GetIt.I.get<journal.PostMediaSerializer>();
+    return journal.RecordSerializer(postMediaSerializer);
   });
   GetIt.I.registerLazySingleton<JournalDao>(() {
     var repository = GetIt.I.get<JournalRepository>();
-    var serializer = GetIt.I.get<RecordSerializer>();
+    var serializer = GetIt.I.get<journal.RecordSerializer>();
     return JournalDao(repository, serializer);
   });
   GetIt.I.registerLazySingletonAsync<SharedPreferences>(() async {
@@ -86,12 +91,16 @@ initDependencies() {
     var database = GetIt.I.get<Database>();
     return MediaController(database);
   });
-  GetIt.I.registerLazySingleton<AccountContext>(() {
+  GetIt.I.registerLazySingleton<AccountContextSerializer>(() {
+    return AccountContextSerializer();
+  });
+  GetIt.I.registerLazySingleton<Context<AccountContext>>(() {
     var jarDao = GetIt.I.get<JarDao>();
-    return AccountContext(_accountJarId, jarDao);
+    var serializer = GetIt.I.get<AccountContextSerializer>();
+    return Context<AccountContext>(_accountJarId, jarDao, serializer);
   });
   GetIt.I.registerLazySingleton<Account>(() {
-    var context = GetIt.I.get<AccountContext>();
+    var context = GetIt.I.get<Context<AccountContext>>();
     var uuid = GetIt.I.get<Uuid>();
     return Account(uuid, context);
   });
@@ -195,9 +204,17 @@ initDependencies() {
     var mediaDao = GetIt.I.get<MediaDao>();
     return BroadcastStep(mediaDao);
   });
-  GetIt.I.registerLazySingleton<PostMediaContext>(() {
+  GetIt.I.registerLazySingleton<AssetStepResultSerializer>(() {
+    return AssetStepResultSerializer();
+  });
+  GetIt.I.registerLazySingleton<PostMediaContextSerializer>(() {
+    var assetSerializer = GetIt.I.get<AssetStepResultSerializer>();
+    return PostMediaContextSerializer(assetSerializer);
+  });
+  GetIt.I.registerLazySingleton<Context<PostMediaContext>>(() {
     var jarDao = GetIt.I.get<JarDao>();
-    return PostMediaContext(_postMediaJarId, jarDao);
+    var serializer = GetIt.I.get<PostMediaContextSerializer>();
+    return Context<PostMediaContext>(_postMediaJarId, jarDao, serializer);
   });
   GetIt.I.registerLazySingleton<PostMediaJob>(() {
     var database = GetIt.I.get<Database>();
@@ -215,7 +232,7 @@ initDependencies() {
     var journalStep = GetIt.I.get<JournalStep>();
     var broadcastStep = GetIt.I.get<BroadcastStep>();
 
-    var context = GetIt.I.get<PostMediaContext>();
+    var context = GetIt.I.get<Context<PostMediaContext>>();
     return PostMediaJob(
       database,
       context,

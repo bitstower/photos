@@ -1,32 +1,53 @@
 import 'package:flutter/foundation.dart';
+import 'package:photos/utils/serializer.dart';
 
-import '../step_result.dart';
+class AssetStepResult {
+  String? uuid;
+  Uint8List? secretKey;
+  Uint8List? secretHeader;
+  String? checksum;
+  int? fileSize;
+  String? fileType;
 
-class AssetStepResult extends StepResult {
-  static const _uuid = 'uuid';
-  static const _secretKey = 'secretKey';
-  static const _secretHeader = 'secretHeader';
-  static const _checksum = 'checksum';
-  static const _fileSize = 'fileSize';
-  static const _fileType = 'fileType';
+  AssetStepResult({
+    required this.uuid,
+    required this.secretKey,
+    required this.secretHeader,
+    required this.checksum,
+    required this.fileSize,
+    required this.fileType,
+  });
+}
 
-  AssetStepResult(
-    super.prefix,
-    super.getValueCallback,
-    super.setValueCallback,
-  );
+class AssetStepResultSerializer extends Serializer<AssetStepResult> {
+  final _uuid = 'uuid';
+  final _secretKey = 'secretKey';
+  final _secretHeader = 'secretHeader';
+  final _checksum = 'checksum';
+  final _fileSize = 'fileSize';
+  final _fileType = 'fileType';
 
-  String? getUuid() => getValue(_uuid);
-  Uint8List? getSecretKey() => getValue(_secretKey);
-  Uint8List? getSecretHeader() => getValue(_secretHeader);
-  int? getFileSize() => getValue(_fileSize);
-  String? getFileType() => getValue(_fileType);
-  String? getChecksum() => getValue(_checksum);
+  @override
+  AssetStepResult fromJson(Map json) {
+    return AssetStepResult(
+      uuid: json[_uuid] as String?,
+      secretKey: json[_secretKey] as Uint8List?,
+      secretHeader: json[_secretHeader] as Uint8List?,
+      checksum: json[_checksum] as String?,
+      fileSize: json[_fileSize] as int?,
+      fileType: json[_fileType] as String?,
+    );
+  }
 
-  Future setUuid(String value) => setValue(_uuid, value);
-  Future setSecretKey(Uint8List value) => setValue(_secretKey, value);
-  Future setSecretHeader(Uint8List value) => setValue(_secretHeader, value);
-  Future setFileSize(int value) => setValue(_fileSize, value);
-  Future setFileType(String value) => setValue(_fileType, value);
-  Future setChecksum(String value) => setValue(_checksum, value);
+  @override
+  Map toJson(AssetStepResult src) {
+    var json = <String, dynamic>{};
+    json[_uuid] = src.uuid;
+    json[_secretKey] = src.secretKey;
+    json[_secretHeader] = src.secretHeader;
+    json[_checksum] = src.checksum;
+    json[_fileSize] = src.fileSize;
+    json[_fileType] = src.fileType;
+    return Map.unmodifiable(json);
+  }
 }

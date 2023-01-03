@@ -3,55 +3,46 @@ import 'package:photos/jobs/post_media/asset_step_result.dart';
 import 'package:photos/jobs/post_media/post_media_context.dart';
 import 'package:photos/models/media.dart';
 import 'package:photos/services/media_dao.dart';
-import 'package:photos/jobs/step_result.dart';
+import 'package:photos/utils/context.dart';
+import 'package:photos/utils/dummy.dart';
 
 import '../step.dart';
 
 @sealed
-class BroadcastStep extends Step<PostMediaContext> {
+class BroadcastStep extends Step<PostMediaContext, Dummy> {
   final MediaDao _mediaDao;
 
   BroadcastStep(this._mediaDao);
 
   @override
-  Future execute(PostMediaContext context) async {
-    final mediaId = context.getMediaId();
+  Future execute(Context<PostMediaContext> context) async {
+    final mediaId = context.data.mediaId;
     assert(mediaId != null);
 
     final media = await _mediaDao.getById(mediaId!);
     assert(media != null);
 
     media!
-      ..remoteSmThumb = RemoteAsset()
-      ..remoteMdThumb = RemoteAsset()
-      ..remoteLgThumb = RemoteAsset()
-      ..remoteOrigin = RemoteAsset()
+      ..remoteSmThumb = _buildAsset(context.data.smThumbAssetStep)
+      ..remoteMdThumb = _buildAsset(context.data.mdThumbAssetStep)
+      ..remoteLgThumb = _buildAsset(context.data.lgThumbAssetStep)
+      ..remoteOrigin = _buildAsset(context.data.originAssetStep)
       ..uploaded = true;
-
-    copyAsset(context.smThumbAssetStep, media.remoteSmThumb!);
-    copyAsset(context.mdThumbAssetStep, media.remoteMdThumb!);
-    copyAsset(context.lgThumbAssetStep, media.remoteLgThumb!);
-    copyAsset(context.originAssetStep, media.remoteOrigin!);
 
     await _mediaDao.put(media);
   }
 
-  copyAsset(AssetStepResult src, RemoteAsset dst) {
-    dst
-      ..uuid = src.getUuid()!
-      ..secretKey = src.getSecretKey()!
-      ..secretHeader = src.getSecretHeader()!
-      ..fileSize = src.getFileSize()!
-      ..fileType = src.getFileType()!;
+  RemoteAsset _buildAsset(AssetStepResult src) {
+    return RemoteAsset()
+      ..uuid = src.uuid!
+      ..secretKey = src.secretKey!
+      ..secretHeader = src.secretHeader!
+      ..fileSize = src.fileSize!
+      ..fileType = src.fileType!;
   }
 
   @override
-  Future revert(PostMediaContext context) {
-    throw UnimplementedError();
-  }
-
-  @override
-  StepResult getResult(PostMediaContext context) {
+  Dummy getResult(Context<PostMediaContext> context) {
     throw UnimplementedError();
   }
 }

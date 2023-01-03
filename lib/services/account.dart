@@ -1,11 +1,12 @@
 import 'package:photos/journal/remote_journal_dsc.dart';
+import 'package:photos/utils/serializer.dart';
 import 'package:uuid/uuid.dart';
 
 import '../utils/context.dart';
 
 class Account {
   final Uuid _uuid;
-  final AccountContext _context;
+  final Context<AccountContext> _context;
 
   Account(this._uuid, this._context);
 
@@ -22,12 +23,11 @@ class Account {
   }
 
   Future<String> getDeviceUuid() async {
-    var uuid = _context.getDeviceUuid();
-    if (uuid == null) {
-      uuid = _uuid.v4();
-      await _context.setDeviceUuid(uuid);
+    if (_context.data.deviceId == null) {
+      _context.data.deviceId = _uuid.v4();
+      await _context.persist();
     }
-    return uuid;
+    return _context.data.deviceId!;
   }
 
   Future<List<RemoteJournalInfo>> getRemoteJournalInfos() async {
@@ -35,11 +35,26 @@ class Account {
   }
 }
 
-class AccountContext extends Context {
-  static const _deviceUuid = 'deviceId';
+class AccountContext {
+  String? deviceId;
 
-  AccountContext(super.jarId, super.jarDao);
+  AccountContext({this.deviceId});
+}
 
-  String? getDeviceUuid() => getValue(_deviceUuid);
-  Future setDeviceUuid(String value) => setValue(_deviceUuid, value);
+class AccountContextSerializer extends Serializer<AccountContext> {
+  final _deviceId = 'deviceId';
+
+  @override
+  AccountContext fromJson(Map json) {
+    return AccountContext(
+      deviceId: json[_deviceId] as String?,
+    );
+  }
+
+  @override
+  Map toJson(AccountContext src) {
+    var json = <String, dynamic>{};
+    json[_deviceId] = src.deviceId;
+    return Map.unmodifiable(json);
+  }
 }

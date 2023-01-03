@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:meta/meta.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photos/utils/context.dart';
 
 import 'asset_step_result.dart';
 import 'asset_step.dart';
@@ -20,8 +21,8 @@ class OriginAssetStep extends AssetStep {
   );
 
   @override
-  Future<File> getAsset(PostMediaContext context) async {
-    final mediaId = context.getMediaId();
+  Future<File> getAsset(Context<PostMediaContext> context) async {
+    final mediaId = context.data.mediaId;
     assert(mediaId != null);
 
     final conn = database.open();
@@ -47,7 +48,7 @@ class OriginAssetStep extends AssetStep {
   }
 
   @override
-  AssetStepResult getResult(PostMediaContext context) {
-    return context.originAssetStep;
+  AssetStepResult getResult(Context<PostMediaContext> context) {
+    return context.data.originAssetStep;
   }
 }

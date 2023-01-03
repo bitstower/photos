@@ -5,17 +5,22 @@ import 'package:photos/journal/journal_context.dart';
 
 import '../services/account.dart';
 import '../services/s3fs.dart';
+import '../utils/context.dart';
 import 'journal.dart';
 
 class JournalRepository {
   final Account _account;
   final S3Fs _s3fs;
 
-  final JournalContext _context;
+  final Context<JournalContext> _context;
 
   JournalRepository(this._context, this._account, this._s3fs);
 
+  Future init() async {}
+
   Future<List<JournalTracker>> _getTrackers() async {
+    await _context.init();
+
     final thisDeviceUuid = await _account.getDeviceUuid();
     final remoteInfos = await _account.getRemoteJournalInfos();
     final directory = await getApplicationSupportDirectory();
@@ -27,7 +32,7 @@ class JournalRepository {
     for (var remoteInfo in remoteInfos) {
       var tracker = JournalTracker(
         uuid: remoteInfo.deviceUuid,
-        readOffset: _context.getReadOffset(remoteInfo.deviceUuid),
+        readOffset: _context.data.getReadOffset(remoteInfo.deviceUuid),
         own: remoteInfo.deviceUuid == thisDeviceUuid,
         directory: directory,
         remoteFileSize: remoteInfo.fileSize,
@@ -41,7 +46,7 @@ class JournalRepository {
     if (!hasOwn) {
       trackers.add(JournalTracker(
         uuid: thisDeviceUuid,
-        readOffset: _context.getReadOffset(thisDeviceUuid),
+        readOffset: _context.data.getReadOffset(thisDeviceUuid),
         own: true,
         directory: directory,
       ));
@@ -62,10 +67,11 @@ class JournalRepository {
     for (var tracker in trackers) {
       if (tracker.cached && tracker.unread) {
         unread.add(ReadJournal(tracker.file, tracker.readOffset));
-        await _context.setReadOffset(
+        _context.data.setReadOffset(
           tracker.uuid,
           tracker.file.lengthSync(),
         );
+        await _context.persist();
       }
     }
 

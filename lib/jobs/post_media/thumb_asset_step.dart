@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:meta/meta.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photos/utils/context.dart';
 import 'package:photos/utils/image_resolution.dart';
 import 'package:photos/utils/image_size.dart';
 
@@ -25,13 +26,13 @@ class ThumbAssetStep extends AssetStep {
   );
 
   @override
-  Future<File> getAsset(PostMediaContext context) async {
+  Future<File> getAsset(Context<PostMediaContext> context) async {
     final result = getResult(context);
 
-    final uuid = result.getUuid();
+    final uuid = result.uuid;
     assert(uuid != null);
 
-    final mediaId = context.getMediaId();
+    final mediaId = context.data.mediaId;
     assert(mediaId != null);
 
     final connection = database.open();
@@ -81,14 +82,14 @@ class ThumbAssetStep extends AssetStep {
   }
 
   @override
-  AssetStepResult getResult(PostMediaContext context) {
+  AssetStepResult getResult(Context<PostMediaContext> context) {
     switch (_resolution) {
       case ImageResolution.sd:
-        return context.smThumbAssetStep;
+        return context.data.smThumbAssetStep;
       case ImageResolution.hd:
-        return context.mdThumbAssetStep;
+        return context.data.mdThumbAssetStep;
       case ImageResolution.qhd:
-        return context.lgThumbAssetStep;
+        return context.data.lgThumbAssetStep;
       default:
         throw Exception('Unknown resolution');
     }

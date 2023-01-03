@@ -1,8 +1,29 @@
-import '../utils/context.dart';
+import 'package:photos/utils/serializer.dart';
 
-class JournalContext extends Context {
-  JournalContext(super.jarId, super.jarDao);
+class JournalContext {
+  final Map<String, int> readOffsets;
 
-  int getReadOffset(String uuid) => getValue(uuid) ?? 0;
-  Future setReadOffset(String uuid, int value) => setValue(uuid, value);
+  JournalContext({required this.readOffsets});
+
+  int getReadOffset(String uuid) => readOffsets[uuid] ?? 0;
+  setReadOffset(String uuid, int val) => readOffsets[uuid] = val;
+}
+
+class JournalContextSerializer extends Serializer<JournalContext> {
+  final _readOfssets = 'readOffsets';
+
+  @override
+  JournalContext fromJson(Map json) {
+    var readOffsets = json[_readOfssets] as Map<String, int>?;
+    return JournalContext(
+      readOffsets: readOffsets ?? {},
+    );
+  }
+
+  @override
+  Map toJson(JournalContext src) {
+    var json = <String, dynamic>{};
+    json[_readOfssets] = src.readOffsets;
+    return Map.unmodifiable(json);
+  }
 }

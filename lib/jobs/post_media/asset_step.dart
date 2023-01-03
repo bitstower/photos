@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:photos/services/s3fs.dart';
+import 'package:photos/utils/context.dart';
 import 'package:photos/utils/s3/secret.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,7 +16,7 @@ import '../step.dart';
 import 'asset_step_result.dart';
 import 'post_media_context.dart';
 
-abstract class AssetStep extends Step<PostMediaContext> {
+abstract class AssetStep extends Step<PostMediaContext, AssetStepResult> {
   @protected
   final log = Logger('AssetStep');
 
@@ -47,13 +48,14 @@ abstract class AssetStep extends Step<PostMediaContext> {
   );
 
   @override
-  Future execute(PostMediaContext context) async {
+  Future execute(Context<PostMediaContext> context) async {
     final result = getResult(context);
 
-    var uuid = result.getUuid();
+    var uuid = result.uuid;
     if (uuid == null) {
       uuid = getUuid();
-      await result.setUuid(uuid);
+      result.uuid = uuid;
+      await context.persist();
       log.info('Generated UUID, uuid=$uuid');
     } else {
       log.info('UUID found in the step result, uuid=$uuid');
@@ -73,6 +75,8 @@ abstract class AssetStep extends Step<PostMediaContext> {
       uploadFuture,
     ]);
 
+    await context.persist();
+
     if (!shouldKeepAsset()) {
       await assetFile.delete();
       log.info('Deleted input file, path=${assetFile.path}');
@@ -85,7 +89,7 @@ abstract class AssetStep extends Step<PostMediaContext> {
     File assetFile,
   ) async {
     final fileType = getFileType(assetFile);
-    await result.setFileType(fileType);
+    result.fileType = fileType;
     log.info('Generated file type, fileType=$fileType');
   }
 
@@ -95,7 +99,7 @@ abstract class AssetStep extends Step<PostMediaContext> {
     File assetFile,
   ) async {
     final fileSize = await getFileSize(assetFile);
-    await result.setFileSize(fileSize);
+    result.fileSize = fileSize;
     log.info('Generated file size, fileSize=$fileSize');
   }
 
@@ -105,7 +109,7 @@ abstract class AssetStep extends Step<PostMediaContext> {
     File assetFile,
   ) async {
     final checksum = await getChecksum(assetFile);
-    await result.setChecksum(checksum);
+    result.checksum = checksum;
     log.info('Generated checksum, chekcsum=$checksum');
   }
 
@@ -117,24 +121,18 @@ abstract class AssetStep extends Step<PostMediaContext> {
   ) async {
     final secret = await upload(uuid, assetFile);
     log.info('Uploaded file');
-
-    await result.setSecretKey(secret.key);
-    await result.setSecretHeader(secret.header);
+    result.secretKey = secret.key;
+    result.secretHeader = secret.header;
     log.info('Generated secret key and header');
   }
 
   @override
-  Future revert(PostMediaContext context) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  AssetStepResult getResult(PostMediaContext context) {
+  AssetStepResult getResult(Context<PostMediaContext> context) {
     throw UnimplementedError();
   }
 
   @protected
-  Future<File> getAsset(PostMediaContext context);
+  Future<File> getAsset(Context<PostMediaContext> context);
 
   @protected
   bool shouldKeepAsset();

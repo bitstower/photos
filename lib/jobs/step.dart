@@ -1,12 +1,10 @@
 import 'package:flutter/cupertino.dart';
 
 import '../utils/context.dart';
-import 'step_result.dart';
 
-abstract class Step<T extends Context> {
-  Future execute(T context);
-  Future revert(T context);
+abstract class Step<T, E> {
+  Future execute(Context<T> context);
 
   @protected
-  StepResult getResult(T context);
+  E getResult(Context<T> context);
 }

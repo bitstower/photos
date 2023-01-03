@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 
 import '../utils/context.dart';
 
-abstract class Job<T extends Context> {
+abstract class Job<T> {
   @protected
-  final T context;
+  final Context<T> context;
 
   Job(this.context);
 
