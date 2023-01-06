@@ -20,3 +20,11 @@ Uint8List toUint32(int value) {
 Uint8List incrementUint32(Uint8List bytes, int step) {
   return toUint32(fromUint32(bytes) + step);
 }
+
+Uint8List toUint8List(List<int> input) {
+  if (input is Uint8List) {
+    return input;
+  } else {
+    return Uint8List.fromList(input);
+  }
+}

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photos/services/local_media_replicator.dart';
 import 'package:photos/services/network_storage.dart';
+import 'package:photos/services/secret_stream.dart';
 import 'package:photos/utils/tmp_dir.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,11 +56,48 @@ class _DebugPageState extends State<DebugPage> {
   }
 
   Future uploadTest() async {
-    var ns = buildNetworkStorage();
+    // var ns = buildNetworkStorage();
     var tmpDir = const TmpDir();
-    var file = await tmpDir.getFile('test', 'txt');
-    file.writeAsStringSync("Lorem ipsum", flush: true);
-    await ns.upload('test2.txt', file);
+
+    var file1 = await tmpDir.getFile('test1', 'txt');
+    file1.writeAsStringSync("Lorem ipsum", flush: true);
+
+    final secretStream = SecretStream();
+    final secretKey = secretStream.generateSecretKey();
+
+    final chunks1 = secretStream.encrypt(
+      file1.openRead(),
+      file1.lengthSync(),
+      secretKey,
+    );
+
+    var file2 = await tmpDir.getFile('test', 'enc');
+    if (file2.existsSync()) {
+      file2.deleteSync();
+    }
+
+    await for (final chunk in chunks1) {
+      await file2.writeAsBytes(chunk, mode: FileMode.append);
+    }
+
+    var file3 = await tmpDir.getFile('test2', 'txt');
+    if (file3.existsSync()) {
+      file3.deleteSync();
+    }
+
+    final chunks2 = secretStream.decrypt(
+      file2.openRead(),
+      file2.lengthSync(),
+      secretKey,
+    );
+
+    await for (final chunk in chunks2) {
+      await file3.writeAsBytes(chunk, mode: FileMode.append);
+    }
+
+    print('==> ' + file3.readAsStringSync());
+
+    // await ns.upload('test2.txt', file);
   }
 
   Future<List<_Property>> loadCfgProps() async {
